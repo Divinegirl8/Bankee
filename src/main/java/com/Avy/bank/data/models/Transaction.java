@@ -13,6 +13,8 @@ public class Transaction {
     private Long id;
     private Long amount;
     private String description;
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Account account;
     private TransactionType transactionType;
     private TransactionStatus status;
 }
