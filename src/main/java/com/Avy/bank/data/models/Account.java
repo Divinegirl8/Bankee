@@ -7,6 +7,8 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Setter
 @Getter
@@ -18,5 +20,7 @@ public class Account {
     private Long accountNumber;
     private Long balance;
     private AccountType accountType;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
 }

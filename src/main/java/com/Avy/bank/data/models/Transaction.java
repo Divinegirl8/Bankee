@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Setter
 @Getter
@@ -17,4 +19,5 @@ public class Transaction {
     private Account account;
     private TransactionType transactionType;
     private TransactionStatus status;
+    private LocalDateTime createdAt;
 }
