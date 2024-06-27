@@ -11,7 +11,6 @@ public class UserServiceApp implements UserService{
 
     @Override
     public UserRegistrationResponse register(UserRegistrationRequest request) {
-
-        return null;
+        boolean isRegistered = user
     }
 }
