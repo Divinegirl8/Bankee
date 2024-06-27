@@ -3,6 +3,7 @@ package com.Avy.bank.userTests;
 import com.Avy.bank.data.models.AccountType;
 import com.Avy.bank.dtos.requests.UserRegistrationRequest;
 import com.Avy.bank.dtos.responses.UserRegistrationResponse;
+import com.Avy.bank.exceptions.UserExistException;
 import com.Avy.bank.services.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ public class UserServiceTest {
     @Autowired
     private UserService userService;
     @Test
-    public void testThatAUserCanRegister(){
+    public void testThatAUserCanRegister() throws UserExistException {
         UserRegistrationRequest request = new UserRegistrationRequest();
         request.setFullName("Agboola Tobi Samuel");
         request.setEmail("tobi4tee@gmail.com");
