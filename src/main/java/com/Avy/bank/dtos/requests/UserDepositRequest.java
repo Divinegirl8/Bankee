@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 public class UserDepositRequest {
     private String accountNumber;
-    private Double amount;
+    private Long amount;
     private String description;
     private String depositor;
     private LocalDateTime depositDate;
