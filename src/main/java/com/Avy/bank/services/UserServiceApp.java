@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 @Service
 @AllArgsConstructor
@@ -24,30 +23,16 @@ public class UserServiceApp implements UserService{
 
     @Override
     public UserRegistrationResponse register(UserRegistrationRequest request) throws UserExistException {
-        User user = userRepository.findByEmail(request.getEmail());
-        boolean isRegistered = user != null;
+        boolean isRegistered  = userRepository.findByEmail(request.getEmail()) !=null;
         if (isRegistered) throw new UserExistException("User already exist");
 
-
         User newUser = new User();
+        Account account = new Account();
+        account.setAccountName(request.getFullName());
+        account.setAccountType(request.getAccountType());
+        account.setAccountNumber(AccountNumberGenerator.generateAccountNumber());
+        account.setCreatedAt(LocalDateTime.now());
 
-        ArrayList<Account> accounts = new ArrayList<>();
-        Account acc = new Account();
-        acc.setAccountName(request.getFullName());
-        acc.setAccountType(request.getAccountType());
-        acc.setAccountNumber(AccountNumberGenerator.generateAccountNumber());
-        acc.setCreatedAt(LocalDateTime.now());
-
-        String accountNumber = acc.getAccountNumber();
-
-        String existingAccountNumber = accountRepository.findByAccountNumber(acc.getAccountNumber());
-
-        if (existingAccountNumber != null && !existingAccountNumber.equals(accountNumber)) {
-            throw new UserExistException("Account number already exist");
-        }
-
-
-        accounts.add(acc);
 
         newUser.setEmail(request.getEmail());
         newUser.setPassword(request.getPassword());
@@ -55,16 +40,16 @@ public class UserServiceApp implements UserService{
         newUser.setPhoneNumber(request.getPhoneNumber());
         newUser.setAddress(request.getAddress());
         newUser.setAccountType(request.getAccountType());
-        newUser.setAccount(accounts);
+        newUser.setAccount(account);
         newUser.setCreatedAt(LocalDateTime.now());
-        accountRepository.save(acc);
+        accountRepository.save(account);
         userRepository.save(newUser);
 
 
 
         UserRegistrationResponse response = new UserRegistrationResponse();
         response.setId(newUser.getId());
-        response.setMessage("Dear " + newUser.getFullName() + " your account number is " + accountNumber + " . Thanks for banking with us! We're thrilled to have you...");
+        response.setMessage("Dear " + newUser.getFullName() + " your account number is " + account + " . Thanks for banking with us! We're thrilled to have you...");
         return response;
     }
 }

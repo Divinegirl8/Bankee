@@ -19,10 +19,10 @@ public class User {
     private String password;
     private String address;
     private String phoneNumber;
+    @OneToOne(cascade = CascadeType.REMOVE,fetch = FetchType.EAGER)
+    private Account account;
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
-    private List<Account> account;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
