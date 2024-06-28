@@ -1,13 +1,11 @@
 package com.Avy.bank.data.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Setter
@@ -17,9 +15,13 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long accountNumber;
+    private String accountName;
+    private String accountNumber;
     private Long balance;
+    @Enumerated(EnumType.STRING)
     private AccountType accountType;
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
+    private List<Transaction> transactionHistory;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

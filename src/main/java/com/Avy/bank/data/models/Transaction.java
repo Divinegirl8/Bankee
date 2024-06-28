@@ -17,7 +17,9 @@ public class Transaction {
     private String description;
     @ManyToOne(fetch = FetchType.EAGER)
     private Account account;
+    @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
+    @Enumerated(EnumType.STRING)
     private TransactionStatus status;
     private LocalDateTime createdAt;
 }
