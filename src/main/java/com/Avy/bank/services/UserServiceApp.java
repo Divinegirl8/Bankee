@@ -31,8 +31,9 @@ public class UserServiceApp implements UserService{
         account.setAccountName(request.getFullName());
         account.setAccountType(request.getAccountType());
         account.setAccountNumber(AccountNumberGenerator.generateAccountNumber());
+        account.setBalance(Long.valueOf(0));
         account.setCreatedAt(LocalDateTime.now());
-
+        accountRepository.save(account);
 
         newUser.setEmail(request.getEmail());
         newUser.setPassword(request.getPassword());
@@ -42,7 +43,7 @@ public class UserServiceApp implements UserService{
         newUser.setAccountType(request.getAccountType());
         newUser.setAccount(account);
         newUser.setCreatedAt(LocalDateTime.now());
-        accountRepository.save(account);
+
         userRepository.save(newUser);
 
 
