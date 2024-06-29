@@ -53,4 +53,7 @@ public class UserServiceApp implements UserService{
         response.setMessage("Dear " + newUser.getFullName() + " your account number is " + account + " . Thanks for banking with us! We're thrilled to have you...");
         return response;
     }
+
+
+
 }

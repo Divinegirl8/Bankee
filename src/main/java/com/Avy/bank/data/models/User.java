@@ -19,7 +19,7 @@ public class User {
     private String password;
     private String address;
     private String phoneNumber;
-    @OneToOne(cascade = CascadeType.REMOVE,fetch = FetchType.EAGER)
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private Account account;
     @Enumerated(EnumType.STRING)
     private AccountType accountType;

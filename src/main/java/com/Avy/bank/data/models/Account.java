@@ -21,7 +21,7 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
-    private List<Transaction> transactionHistory;
+    private List<TransactionOnAccount> transactionOnAccountHistory;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

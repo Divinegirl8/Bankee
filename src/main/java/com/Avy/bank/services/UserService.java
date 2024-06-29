@@ -6,4 +6,6 @@ import com.Avy.bank.exceptions.UserExistException;
 
 public interface UserService {
     UserRegistrationResponse register(UserRegistrationRequest request) throws UserExistException;
+
+
 }
