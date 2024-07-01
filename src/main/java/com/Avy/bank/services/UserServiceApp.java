@@ -1,6 +1,6 @@
 package com.Avy.bank.services;
 
-import com.Avy.bank.data.models.Account;
+import com.Avy.bank.data.models.UserAccount;
 import com.Avy.bank.data.models.User;
 import com.Avy.bank.data.repositories.AccountRepository;
 import com.Avy.bank.data.repositories.UserRepository;
@@ -11,7 +11,9 @@ import com.Avy.bank.utils.AccountNumberGenerator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 @Service
 @AllArgsConstructor
@@ -27,21 +29,24 @@ public class UserServiceApp implements UserService{
         if (isRegistered) throw new UserExistException("User already exist");
 
         User newUser = new User();
-        Account account = new Account();
-        account.setAccountName(request.getFullName());
-        account.setAccountType(request.getAccountType());
-        account.setAccountNumber(AccountNumberGenerator.generateAccountNumber());
-        account.setBalance(Long.valueOf(0));
-        account.setCreatedAt(LocalDateTime.now());
-        accountRepository.save(account);
+
+        ArrayList<UserAccount> accounts = new ArrayList<>();
+
+        UserAccount userAccount = new UserAccount();
+        userAccount.setAccountName(request.getFullName());
+        userAccount.setAccountType(request.getAccountType());
+        userAccount.setAccountNumber(AccountNumberGenerator.generateAccountNumber());
+        userAccount.setBalance(BigDecimal.valueOf(0));
+        userAccount.setCreatedAt(LocalDateTime.now());
+        accountRepository.save(userAccount);
 
         newUser.setEmail(request.getEmail());
         newUser.setPassword(request.getPassword());
         newUser.setFullName(request.getFullName());
         newUser.setPhoneNumber(request.getPhoneNumber());
         newUser.setAddress(request.getAddress());
-        newUser.setAccountType(request.getAccountType());
-        newUser.setAccount(account);
+        accounts.add(userAccount);
+        newUser.setUserAccount(accounts);
         newUser.setCreatedAt(LocalDateTime.now());
 
         userRepository.save(newUser);
@@ -50,10 +55,8 @@ public class UserServiceApp implements UserService{
 
         UserRegistrationResponse response = new UserRegistrationResponse();
         response.setId(newUser.getId());
-        response.setMessage("Dear " + newUser.getFullName() + " your account number is " + account + " . Thanks for banking with us! We're thrilled to have you...");
+        response.setMessage("Dear " + newUser.getFullName() + " your account number is " + userAccount + " . Thanks for banking with us! We're thrilled to have you...");
         return response;
     }
-
-
 
 }

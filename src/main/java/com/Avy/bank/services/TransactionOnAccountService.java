@@ -1,11 +1,8 @@
 package com.Avy.bank.services;
 
-import com.Avy.bank.dtos.requests.UserDepositRequest;
-import com.Avy.bank.dtos.responses.UserDepositResponse;
-import com.Avy.bank.exceptions.InvalidAccountNumberException;
+import com.Avy.bank.data.models.TransactionOnAccount;
 
 public interface TransactionOnAccountService {
 
-
-    UserDepositResponse makeDeposit(UserDepositRequest request) throws InvalidAccountNumberException;
+    void save(TransactionOnAccount transaction);
 }

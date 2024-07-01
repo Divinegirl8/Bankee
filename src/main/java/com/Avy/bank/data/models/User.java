@@ -19,10 +19,8 @@ public class User {
     private String password;
     private String address;
     private String phoneNumber;
-    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    private Account account;
-    @Enumerated(EnumType.STRING)
-    private AccountType accountType;
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<UserAccount> userAccount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -11,16 +12,16 @@ import java.util.List;
 @Setter
 @Getter
 
-public class Account {
+public class UserAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String accountName;
     private String accountNumber;
-    private Long balance;
+    private BigDecimal balance;
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
+    @OneToMany(fetch = FetchType.EAGER)
     private List<TransactionOnAccount> transactionOnAccountHistory;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

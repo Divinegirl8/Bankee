@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 
 @Entity
@@ -12,11 +14,15 @@ import java.time.LocalDateTime;
 @Getter
 public class TransactionOnAccount {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private Long amount;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+    private BigDecimal amount;
     private String description;
     private String accountNumber;
+    private String accountName;
+    private String depositor;
+    @ManyToOne(fetch = FetchType.EAGER)
+    private UserAccount account;
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
     @Enumerated(EnumType.STRING)
