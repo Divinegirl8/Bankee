@@ -7,8 +7,10 @@ import com.Avy.bank.data.models.TransactionOnAccount;
 import com.Avy.bank.data.repositories.AccountRepository;
 import com.Avy.bank.dtos.requests.UserBalanceRequest;
 import com.Avy.bank.dtos.requests.UserDepositRequest;
+import com.Avy.bank.dtos.requests.UserWithdrawRequest;
 import com.Avy.bank.dtos.responses.UserBalanceResponse;
 import com.Avy.bank.dtos.responses.UserDepositResponse;
+import com.Avy.bank.dtos.responses.UserWithdrawResponse;
 import com.Avy.bank.exceptions.AccountNumberNotFound;
 import com.Avy.bank.exceptions.InvalidAmountException;
 import lombok.AllArgsConstructor;
@@ -51,7 +53,7 @@ public class AccountServiceApp  implements AccountService {
 
         UserDepositResponse response = new UserDepositResponse();
         response.setTransactionId(transaction.getId());
-        response.setMessage("Dear " + transaction.getDepositor() + " you have deposited N" + request.getAmount() + " into " + existingUserAccount.getAccountNumber() + ". Your transaction Id is: " + transaction.getId() +  ". Thanks you for banking with us!");
+        response.setMessage("Dear " + transaction.getPerformedBy() + " you have deposited N" + request.getAmount() + " into " + existingUserAccount.getAccountNumber() + ". Your transaction Id is: " + transaction.getId() +  ". Thanks you for banking with us!");
         return response;
     }
 
@@ -67,12 +69,45 @@ public class AccountServiceApp  implements AccountService {
         return response;
     }
 
+    @Override
+    public UserWithdrawResponse makeWithdraw(UserWithdrawRequest request) throws InvalidAmountException, AccountNumberNotFound {
+        UserAccount existingUserAccount = accountRepository.findByAccountNumber(request.getAccountNumber());
+        if (request.getAmount().subtract(existingUserAccount.getBalance()).equals(BigDecimal.ZERO))
+            throw new InvalidAmountException("Insufficient balance");
+
+        List<TransactionOnAccount>  transactionHistory =  existingUserAccount.getTransactionOnAccountHistory();
+
+        existingUserAccount.setBalance(existingUserAccount.getBalance().subtract(request.getAmount()));
+
+        TransactionOnAccount transaction = new TransactionOnAccount();
+        transaction.setAccountNumber(existingUserAccount.getAccountNumber());
+        transaction.setAmount(request.getAmount());
+        transaction.setTransactionType(TransactionType.WITHDRAW);
+        transaction.setAccountName(request.getAccountName());
+        if (!request.getAccountName().equals(existingUserAccount.getAccountName())) throw new AccountNumberNotFound("Invalid account details");
+        transaction.setDescription(request.getDescription());
+        transaction.setPerformedBy(request.getPerformedBy());
+        transaction.setAccount(existingUserAccount);
+        transaction.setPerformedAt(LocalDateTime.now());
+        transactionHistory.add(transaction);
+
+        transactionOnAccountService.save(transaction);
+
+        accountRepository.save(existingUserAccount);
+
+
+        UserWithdrawResponse response = new UserWithdrawResponse();
+        response.setBalance(existingUserAccount.getBalance());
+        response.setMessage("Dear " + existingUserAccount.getAccountName() + ". You have successfully withdrawn " + request.getAmount() + ". Your acct balance: " + existingUserAccount.getBalance() + ". Thanks for banking with us!");
+        return response;
+    }
+
     private static TransactionOnAccount getTransactionOnAccount(UserDepositRequest request, UserAccount existingUserAccount) {
         TransactionOnAccount transaction = new TransactionOnAccount();
         transaction.setAmount(request.getAmount());
         transaction.setAccountNumber(existingUserAccount.getAccountNumber());
         transaction.setAccountName(existingUserAccount.getAccountName());
-        transaction.setDepositor(request.getDepositor());
+        transaction.setPerformedBy(request.getDepositor());
         transaction.setDescription(request.getDescription());
         transaction.setAccount(existingUserAccount);
         transaction.setTransactionType(TransactionType.DEPOSIT);

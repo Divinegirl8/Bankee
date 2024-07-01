@@ -5,6 +5,7 @@ import com.Avy.bank.dtos.requests.UserDepositRequest;
 import com.Avy.bank.dtos.requests.UserWithdrawRequest;
 import com.Avy.bank.dtos.responses.UserBalanceResponse;
 import com.Avy.bank.dtos.responses.UserDepositResponse;
+import com.Avy.bank.dtos.responses.UserWithdrawResponse;
 import com.Avy.bank.exceptions.AccountNumberNotFound;
 import com.Avy.bank.exceptions.InvalidAmountException;
 import com.Avy.bank.services.AccountService;
@@ -95,13 +96,29 @@ public class UserAccountServiceTest {
     }
 
     @Test
-    public void testThatWithdrawalCanBMadeOnAnExistingAccount(){
+    public void testThatWithdrawalCanBMadeOnAnExistingAccount() throws InvalidAmountException {
         UserWithdrawRequest request = new UserWithdrawRequest();
         request.setAccountNumber("0000000028");
-        request.setAmount(BigDecimal.valueOf(2000));
+        request.setAmount(BigDecimal.valueOf(1500));
         request.setPerformedAt("25/06/2024");
 
-        UserWithdrawResponse response =
+        UserWithdrawResponse response = accountService.makeWithdraw(request);
 
+        assertThat(response).isNotNull();
+
+    }
+    @Test
+    public void testThatMultipleWithdrawalCanBePerformedOnAnExistingAccount() throws InvalidAmountException {
+        UserWithdrawRequest request = new UserWithdrawRequest();
+        request.setAccountNumber("0000000028");
+        request.setAmount(BigDecimal.valueOf(500));
+        request.setPerformedBy("Agu Sandra");
+        request.setDescription("Personal");
+        request.setAccountName("Agu Sandra");
+        request.setPerformedAt("25/06/2024");
+
+        UserWithdrawResponse response = accountService.makeWithdraw(request);
+
+        assertThat(response).isNotNull();
     }
 }

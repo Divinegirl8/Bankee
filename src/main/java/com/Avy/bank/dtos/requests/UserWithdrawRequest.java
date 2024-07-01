@@ -10,7 +10,10 @@ import java.math.BigDecimal;
 @Getter
 public class UserWithdrawRequest {
     private String accountNumber;
+    private String accountName;
     private BigDecimal amount;
+    private String description;
+    private String performedBy;
     private String performedAt;
 
 }

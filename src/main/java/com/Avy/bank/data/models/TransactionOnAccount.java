@@ -20,7 +20,7 @@ public class TransactionOnAccount {
     private String description;
     private String accountNumber;
     private String accountName;
-    private String depositor;
+    private String performedBy;
     @ManyToOne(fetch = FetchType.EAGER)
     private UserAccount account;
     @Enumerated(EnumType.STRING)
