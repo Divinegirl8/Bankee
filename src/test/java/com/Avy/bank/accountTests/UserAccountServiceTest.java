@@ -96,11 +96,14 @@ public class UserAccountServiceTest {
     }
 
     @Test
-    public void testThatWithdrawalCanBMadeOnAnExistingAccount() throws InvalidAmountException {
+    public void testThatWithdrawalCanBMadeOnAnExistingAccount() throws InvalidAmountException, AccountNumberNotFound {
         UserWithdrawRequest request = new UserWithdrawRequest();
-        request.setAccountNumber("0000000028");
+        request.setAccountNumber("0000000019");
         request.setAmount(BigDecimal.valueOf(1500));
         request.setPerformedAt("25/06/2024");
+        request.setAccountName("Agu Sandra");
+        request.setPerformedBy("Agu Sandra");
+
 
         UserWithdrawResponse response = accountService.makeWithdraw(request);
 
@@ -108,10 +111,10 @@ public class UserAccountServiceTest {
 
     }
     @Test
-    public void testThatMultipleWithdrawalCanBePerformedOnAnExistingAccount() throws InvalidAmountException {
+    public void testThatMultipleWithdrawalCanBePerformedOnAnExistingAccount() throws InvalidAmountException, AccountNumberNotFound {
         UserWithdrawRequest request = new UserWithdrawRequest();
-        request.setAccountNumber("0000000028");
-        request.setAmount(BigDecimal.valueOf(500));
+        request.setAccountNumber("0000000019");
+        request.setAmount(BigDecimal.valueOf(1550));
         request.setPerformedBy("Agu Sandra");
         request.setDescription("Personal");
         request.setAccountName("Agu Sandra");
@@ -120,5 +123,10 @@ public class UserAccountServiceTest {
         UserWithdrawResponse response = accountService.makeWithdraw(request);
 
         assertThat(response).isNotNull();
+    }
+
+    @Test
+    public void testThatFundTransferCanBeMadeBetweenTwoExistingAccounts(){
+        UserFundTransferRequest request = new UserFundTransferRequest();
     }
 }

@@ -74,6 +74,8 @@ public class AccountServiceApp  implements AccountService {
         UserAccount existingUserAccount = accountRepository.findByAccountNumber(request.getAccountNumber());
         if (request.getAmount().subtract(existingUserAccount.getBalance()).equals(BigDecimal.ZERO))
             throw new InvalidAmountException("Insufficient balance");
+        if (!request.getAccountName().equals(existingUserAccount.getAccountName()))
+            throw new AccountNumberNotFound("Invalid account details");
 
         List<TransactionOnAccount>  transactionHistory =  existingUserAccount.getTransactionOnAccountHistory();
 
@@ -84,7 +86,7 @@ public class AccountServiceApp  implements AccountService {
         transaction.setAmount(request.getAmount());
         transaction.setTransactionType(TransactionType.WITHDRAW);
         transaction.setAccountName(request.getAccountName());
-        if (!request.getAccountName().equals(existingUserAccount.getAccountName())) throw new AccountNumberNotFound("Invalid account details");
+        transaction.setStatus(TransactionStatus.SUCCESSFUL);
         transaction.setDescription(request.getDescription());
         transaction.setPerformedBy(request.getPerformedBy());
         transaction.setAccount(existingUserAccount);
