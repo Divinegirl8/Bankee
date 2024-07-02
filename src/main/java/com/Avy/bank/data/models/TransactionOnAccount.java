@@ -14,8 +14,8 @@ import java.util.UUID;
 @Getter
 public class TransactionOnAccount {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.TABLE)
+    private Long id;
     private BigDecimal amount;
     private String description;
     private String accountNumber;

@@ -2,9 +2,11 @@ package com.Avy.bank.accountTests;
 
 import com.Avy.bank.dtos.requests.UserBalanceRequest;
 import com.Avy.bank.dtos.requests.UserDepositRequest;
+import com.Avy.bank.dtos.requests.UserFundTransferRequest;
 import com.Avy.bank.dtos.requests.UserWithdrawRequest;
 import com.Avy.bank.dtos.responses.UserBalanceResponse;
 import com.Avy.bank.dtos.responses.UserDepositResponse;
+import com.Avy.bank.dtos.responses.UserFundTransferResponse;
 import com.Avy.bank.dtos.responses.UserWithdrawResponse;
 import com.Avy.bank.exceptions.AccountNumberNotFound;
 import com.Avy.bank.exceptions.InvalidAmountException;
@@ -44,7 +46,7 @@ public class UserAccountServiceTest {
         UserDepositRequest request = new UserDepositRequest();
         request.setAccountName("Agu Sandra");
         request.setAccountNumber("0000000019");
-        request.setAmount(BigDecimal.valueOf(5000));
+        request.setAmount(BigDecimal.valueOf(75000));
         request.setDescription("Feeding Allowance");
         request.setDepositor("Agboola Boluwatife");
         request.setDepositDate("27/06/2024");
@@ -105,7 +107,7 @@ public class UserAccountServiceTest {
         request.setPerformedBy("Agu Sandra");
 
 
-        UserWithdrawResponse response = accountService.makeWithdraw(request);
+        UserWithdrawResponse response = accountService.makeWithdrawal(request);
 
         assertThat(response).isNotNull();
 
@@ -120,13 +122,23 @@ public class UserAccountServiceTest {
         request.setAccountName("Agu Sandra");
         request.setPerformedAt("25/06/2024");
 
-        UserWithdrawResponse response = accountService.makeWithdraw(request);
+        UserWithdrawResponse response = accountService.makeWithdrawal(request);
 
         assertThat(response).isNotNull();
     }
 
     @Test
-    public void testThatFundTransferCanBeMadeBetweenTwoExistingAccounts(){
+    public void testThatFundTransferCanBeMadeBetweenTwoExistingAccounts() throws AccountNumberNotFound, InvalidAmountException {
         UserFundTransferRequest request = new UserFundTransferRequest();
+        request.setFromAccount("0000000019");
+        request.setToAccount("0000000028");
+        request.setAmount(BigDecimal.valueOf(1200));
+        request.setDescription("Sent for upkeep");
+        request.setPerformedBy("Agu Sandra");
+
+        UserFundTransferResponse response = accountService.transferFund(request);
+        System.out.println(response);
+        assertThat(response).isNotNull();
+
     }
 }

@@ -7,9 +7,11 @@ import com.Avy.bank.data.models.TransactionOnAccount;
 import com.Avy.bank.data.repositories.AccountRepository;
 import com.Avy.bank.dtos.requests.UserBalanceRequest;
 import com.Avy.bank.dtos.requests.UserDepositRequest;
+import com.Avy.bank.dtos.requests.UserFundTransferRequest;
 import com.Avy.bank.dtos.requests.UserWithdrawRequest;
 import com.Avy.bank.dtos.responses.UserBalanceResponse;
 import com.Avy.bank.dtos.responses.UserDepositResponse;
+import com.Avy.bank.dtos.responses.UserFundTransferResponse;
 import com.Avy.bank.dtos.responses.UserWithdrawResponse;
 import com.Avy.bank.exceptions.AccountNumberNotFound;
 import com.Avy.bank.exceptions.InvalidAmountException;
@@ -49,11 +51,15 @@ public class AccountServiceApp  implements AccountService {
         existingUserAccount.setTransactionOnAccountHistory(listOfTransactionOnAccounts);
 
         transactionOnAccountService.save(transaction);
+        existingUserAccount.setTransactionOnAccountHistory(listOfTransactionOnAccounts);
         accountRepository.save(existingUserAccount);
 
         UserDepositResponse response = new UserDepositResponse();
         response.setTransactionId(transaction.getId());
-        response.setMessage("Dear " + transaction.getPerformedBy() + " you have deposited N" + request.getAmount() + " into " + existingUserAccount.getAccountNumber() + ". Your transaction Id is: " + transaction.getId() +  ". Thanks you for banking with us!");
+        response.setMessage("Dear " + transaction.getPerformedBy() + " you have deposited N" + request.getAmount() +
+                " into " + existingUserAccount.getAccountNumber() +
+                ". Your transaction Id is: " + transaction.getId() +
+                ". Thanks you for banking with us!");
         return response;
     }
 
@@ -70,7 +76,7 @@ public class AccountServiceApp  implements AccountService {
     }
 
     @Override
-    public UserWithdrawResponse makeWithdraw(UserWithdrawRequest request) throws InvalidAmountException, AccountNumberNotFound {
+    public UserWithdrawResponse makeWithdrawal(UserWithdrawRequest request) throws InvalidAmountException, AccountNumberNotFound {
         UserAccount existingUserAccount = accountRepository.findByAccountNumber(request.getAccountNumber());
         if (request.getAmount().subtract(existingUserAccount.getBalance()).equals(BigDecimal.ZERO))
             throw new InvalidAmountException("Insufficient balance");
@@ -95,12 +101,79 @@ public class AccountServiceApp  implements AccountService {
 
         transactionOnAccountService.save(transaction);
 
+        existingUserAccount.setTransactionOnAccountHistory(transactionHistory);
         accountRepository.save(existingUserAccount);
 
 
         UserWithdrawResponse response = new UserWithdrawResponse();
         response.setBalance(existingUserAccount.getBalance());
         response.setMessage("Dear " + existingUserAccount.getAccountName() + ". You have successfully withdrawn " + request.getAmount() + ". Your acct balance: " + existingUserAccount.getBalance() + ". Thanks for banking with us!");
+        return response;
+    }
+
+    @Override
+    public UserFundTransferResponse transferFund(UserFundTransferRequest request) throws AccountNumberNotFound, InvalidAmountException {
+
+        UserAccount existingAccountFrom = accountRepository.findByAccountNumber(request.getFromAccount());
+        if (existingAccountFrom == null) throw new AccountNumberNotFound("Invalid account number");
+
+        UserAccount existingAccountTo = accountRepository.findByAccountNumber(request.getToAccount());
+        if (existingAccountTo == null) throw new AccountNumberNotFound("Invalid account number");
+
+        if (existingAccountFrom.getBalance().subtract(request.getAmount()).compareTo(BigDecimal.ZERO) < 1)
+            throw new InvalidAmountException("Insufficient fund");
+
+        List<TransactionOnAccount> existingTransactionOnAccountFrom = existingAccountFrom.getTransactionOnAccountHistory();
+
+        List<TransactionOnAccount> existingTransactionOnAccountsTo = existingAccountTo.getTransactionOnAccountHistory();
+
+        existingAccountFrom.setBalance(existingAccountFrom.getBalance().subtract(request.getAmount()));
+
+        existingAccountTo.setBalance(existingAccountTo.getBalance().add(request.getAmount()));
+
+
+        TransactionOnAccount transactionFrom = new TransactionOnAccount();
+        transactionFrom.setAccountNumber(existingAccountFrom.getAccountNumber());
+        transactionFrom.setAccountName(existingAccountFrom.getAccountName());
+        transactionFrom.setAmount(request.getAmount());
+        transactionFrom.setTransactionType(TransactionType.TRANSFER);
+        transactionFrom.setStatus(TransactionStatus.SUCCESSFUL);
+        transactionFrom.setPerformedBy(existingAccountFrom.getAccountName());
+        transactionFrom.setAccount(existingAccountFrom);
+        transactionFrom.setDescription(request.getDescription());
+        transactionFrom.setPerformedAt(LocalDateTime.now());
+        existingTransactionOnAccountFrom.add(transactionFrom);
+        transactionOnAccountService.save(transactionFrom);
+
+        existingAccountFrom.setTransactionOnAccountHistory(existingTransactionOnAccountFrom);
+
+
+        TransactionOnAccount transactionTo = new TransactionOnAccount();
+        transactionTo.setAccountNumber(existingAccountTo.getAccountNumber());
+        transactionTo.setAccountName(existingAccountTo.getAccountName());
+        transactionTo.setAmount(request.getAmount());
+        transactionTo.setTransactionType(TransactionType.TRANSFER);
+        transactionTo.setStatus(TransactionStatus.SUCCESSFUL);
+        transactionTo.setDescription(request.getDescription());
+        transactionTo.setPerformedBy(existingAccountTo.getAccountName());
+        transactionTo.setAccount(existingAccountTo);
+        transactionTo.setPerformedAt(LocalDateTime.now());
+        existingTransactionOnAccountsTo.add(transactionTo);
+        existingTransactionOnAccountsTo.add(transactionTo);
+
+        transactionOnAccountService.save(transactionFrom);
+
+        existingAccountTo.setTransactionOnAccountHistory(existingTransactionOnAccountsTo);
+
+        accountRepository.save(existingAccountFrom);
+        accountRepository.save(existingAccountTo);
+
+        UserFundTransferResponse response = new UserFundTransferResponse();
+        response.setStatus(TransactionStatus.SUCCESSFUL);
+        response.setMessage("Dear " + existingAccountFrom.getAccountName() +
+                " ,you have successfully transferred "
+                + request.getAmount() + " to "
+                + existingAccountTo.getAccountNumber());
         return response;
     }
 
