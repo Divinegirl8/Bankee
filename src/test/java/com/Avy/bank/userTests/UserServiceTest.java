@@ -1,13 +1,18 @@
 package com.Avy.bank.userTests;
 
 import com.Avy.bank.data.models.AccountType;
+import com.Avy.bank.data.models.User;
+import com.Avy.bank.data.repositories.UserRepository;
 import com.Avy.bank.dtos.requests.UserRegistrationRequest;
+import com.Avy.bank.dtos.requests.ViewAllCustomersRequest;
 import com.Avy.bank.dtos.responses.UserRegistrationResponse;
 import com.Avy.bank.exceptions.UserExistException;
 import com.Avy.bank.services.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -16,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class UserServiceTest {
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserRepository userRepository;
 
 
     @Test
@@ -63,5 +70,10 @@ public class UserServiceTest {
 
     }
 
+    @Test
+    public void testThatAllCustomersCanBeFound(){
+        List<User> allExistingUsers = userRepository.findAll();
+        assertThat(allExistingUsers).isNotNull();
+    }
 
 }
