@@ -6,7 +6,6 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 
 @Entity
@@ -14,14 +13,14 @@ import java.util.UUID;
 @Getter
 public class TransactionOnAccount {
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private BigDecimal amount;
     private String description;
     private String accountNumber;
     private String accountName;
     private String performedBy;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.MERGE)
     private UserAccount account;
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;

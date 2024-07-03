@@ -9,6 +9,7 @@ import com.Avy.bank.dtos.responses.UserDepositResponse;
 import com.Avy.bank.dtos.responses.UserFundTransferResponse;
 import com.Avy.bank.dtos.responses.UserWithdrawResponse;
 import com.Avy.bank.exceptions.AccountNumberNotFound;
+import com.Avy.bank.exceptions.CustomException;
 import com.Avy.bank.exceptions.InvalidAmountException;
 import com.Avy.bank.services.AccountService;
 import org.junit.jupiter.api.Test;
@@ -89,7 +90,7 @@ public class UserAccountServiceTest {
     @Test
     public void  testThatAnExistingAccountBalanceCanBeFound() throws AccountNumberNotFound {
         UserBalanceRequest request = new UserBalanceRequest();
-        request.setAccountNumber("0000000028");
+        request.setAccountNumber("0000000019");
 
         UserBalanceResponse response = accountService.checkBalance(request);
         System.out.println(response.getBalance());
@@ -128,11 +129,12 @@ public class UserAccountServiceTest {
     }
 
     @Test
-    public void testThatFundTransferCanBeMadeBetweenTwoExistingAccounts() throws AccountNumberNotFound, InvalidAmountException {
+    public void testThatFundTransferCanBeMadeBetweenTwoExistingAccounts() throws AccountNumberNotFound, InvalidAmountException, CustomException {
         UserFundTransferRequest request = new UserFundTransferRequest();
         request.setFromAccount("0000000019");
         request.setToAccount("0000000028");
-        request.setAmount(BigDecimal.valueOf(1200));
+
+        request.setAmount(BigDecimal.valueOf(7500));
         request.setDescription("Sent for upkeep");
         request.setPerformedBy("Agu Sandra");
 

@@ -33,12 +33,14 @@ public class UserServiceApp implements UserService{
         ArrayList<UserAccount> accounts = new ArrayList<>();
 
         UserAccount userAccount = new UserAccount();
+
         userAccount.setAccountName(request.getFullName());
         userAccount.setAccountType(request.getAccountType());
         userAccount.setAccountNumber(AccountNumberGenerator.generateAccountNumber());
         userAccount.setBalance(BigDecimal.valueOf(0));
         userAccount.setCreatedAt(LocalDateTime.now());
         accountRepository.save(userAccount);
+        userRepository.save(newUser);
 
         newUser.setEmail(request.getEmail());
         newUser.setPassword(request.getPassword());
@@ -49,7 +51,10 @@ public class UserServiceApp implements UserService{
         newUser.setUserAccount(accounts);
         newUser.setCreatedAt(LocalDateTime.now());
 
+        userAccount.setUserId(newUser.getId());
+
         userRepository.save(newUser);
+        accountRepository.save(userAccount);
 
 
 

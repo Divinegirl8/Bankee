@@ -14,14 +14,15 @@ import java.util.List;
 
 public class UserAccount {
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String accountName;
+    private Long userId;
     private String accountNumber;
     private BigDecimal balance;
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.MERGE)
     private List<TransactionOnAccount> transactionOnAccountHistory;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

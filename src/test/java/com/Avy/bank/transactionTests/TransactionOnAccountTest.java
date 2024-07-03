@@ -1,8 +1,9 @@
 //package com.Avy.bank.transactionTests;
 //
 //
-//import com.Avy.bank.dtos.requests.UserDepositRequest;
-//import com.Avy.bank.dtos.responses.UserDepositResponse;
+//import com.Avy.bank.dtos.requests.ViewDepositRequest;
+//import com.Avy.bank.dtos.responses.ViewDepositResponse;
+//import com.Avy.bank.exceptions.AccountNumberNotFound;
 //import com.Avy.bank.services.TransactionOnAccountService;
 //import org.junit.jupiter.api.Test;
 //import org.springframework.beans.factory.annotation.Autowired;
@@ -17,21 +18,15 @@
 //    private TransactionOnAccountService transactionOnAccountService;
 //
 //    @Test
-//    public void testThatADepositTransactionCanBeExecuted() {
+//    public void testThatAListOfDePositTransactionByOnAnExistingAccountCanBeFound() throws AccountNumberNotFound {
 //
-//            UserDepositRequest request = new UserDepositRequest();
+//        ViewDepositRequest request = new ViewDepositRequest();
+//        request.setAccountNumber("0000000019");
 //
-//
-//            request.setAccountName("Agu Sandra");
-//            request.setAccountNumber("0000000019");
-//            request.setAmount(10000L);
-//            request.setDescription("School fees");
-//            request.setDepositor("Falade Adebola");
-//            request.setDepositDate("25/06/2024");
-//
-//            UserDepositResponse response = transactionOnAccountService.makeDeposit(request);
-//
-//            assertThat(response).isNotNull();
+//        ViewDepositResponse response = transactionOnAccountService.viewDeposit(request);
+//        System.out.println(response.getDeposits());
+//        assertThat(response).isNotNull();
 //
 //    }
+//
 //}
