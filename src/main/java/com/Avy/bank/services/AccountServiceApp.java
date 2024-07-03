@@ -51,6 +51,7 @@ public class AccountServiceApp  implements AccountService {
     private TransactionOnAccount createTransaction(UserDepositRequest request, UserAccount existingUserAccount) {
         TransactionOnAccount transaction = new TransactionOnAccount();
         transaction.setAccountNumber(existingUserAccount.getAccountNumber());
+        transaction.setAccount(existingUserAccount);
         transaction.setAmount(request.getAmount());
         transaction.setTransactionType(TransactionType.DEPOSIT);
         transaction.setAccountName(request.getAccountName());
