@@ -27,14 +27,11 @@ public class AccountServiceApp  implements AccountService {
 
     @Override
     public UserDepositResponse makeDeposit(UserDepositRequest request) throws AccountNumberNotFound, InvalidAmountException {
-
         UserAccount existingUserAccount = retrieveAccount(request.getAccountNumber(), request.getAccountName());
         validateDepositAmount(request.getAmount());
-
         TransactionOnAccount transaction = createTransaction(request, existingUserAccount);
         updateAccountBalanceAndTransactionHistory(existingUserAccount, transaction);
-        transactionService.createTransaction(transaction);
-
+        accountRepository.save(existingUserAccount);
         return createResponse(transaction, existingUserAccount);
     }
 
@@ -51,7 +48,6 @@ public class AccountServiceApp  implements AccountService {
     private TransactionOnAccount createTransaction(UserDepositRequest request, UserAccount existingUserAccount) {
         TransactionOnAccount transaction = new TransactionOnAccount();
         transaction.setAccountNumber(existingUserAccount.getAccountNumber());
-        transaction.setAccount(existingUserAccount);
         transaction.setAmount(request.getAmount());
         transaction.setTransactionType(TransactionType.DEPOSIT);
         transaction.setAccountName(request.getAccountName());
@@ -65,17 +61,15 @@ public class AccountServiceApp  implements AccountService {
     private void updateAccountBalanceAndTransactionHistory(UserAccount existingUserAccount, TransactionOnAccount transaction) {
         existingUserAccount.setBalance(existingUserAccount.getBalance().add(transaction.getAmount()));
         existingUserAccount.getTransactionOnAccountHistory().add(transaction);
-        accountRepository.save(existingUserAccount);
     }
 
     private UserDepositResponse createResponse(TransactionOnAccount transaction, UserAccount existingUserAccount) {
         UserDepositResponse response = new UserDepositResponse();
         response.setTransactionId(transaction.getId());
-        response.setMessage("Dear " + transaction.getPerformedBy() + " you have deposited N" + transaction.getAmount() +
-                " into " + existingUserAccount.getAccountNumber() + ". Your transaction Id is: " + transaction.getId()
-                + ". Thanks you for banking with us!");
+        response.setMessage("Dear " + transaction.getPerformedBy() + " you have deposited N" + transaction.getAmount() + " into " + existingUserAccount.getAccountNumber() + ". Your transaction Id is: " + transaction.getId() + ". Thanks you for banking with us!");
         return response;
     }
+
 
 
 

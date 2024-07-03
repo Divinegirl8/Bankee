@@ -96,8 +96,9 @@ public class UserAccountServiceTest {
     public void testThatWithdrawalCanBMadeOnAnExistingAccount() throws InvalidAmountException, AccountNumberNotFound {
         UserWithdrawRequest request = new UserWithdrawRequest();
         request.setAccountNumber("0000000028");
-        request.setAmount(BigDecimal.valueOf(87000));
+        request.setAmount(BigDecimal.valueOf(4000));
         request.setPerformedAt("25/06/2024");
+        request.setDescription("Upkeep");
         request.setAccountName("Agboola Tobi Samuel");
         request.setPerformedBy("Agu Sandra");
 
