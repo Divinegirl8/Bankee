@@ -8,7 +8,7 @@ import java.util.List;
 
 @Setter
 @Getter
-public class ViewDepositResponse {
+public class ViewTransactionOnAccountResponse {
     private String message;
     private List<TransactionOnAccount> transactionOnAccount;
 }

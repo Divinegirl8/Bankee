@@ -76,4 +76,8 @@ public class UserServiceTest {
         assertThat(allExistingUsers).isNotNull();
     }
 
+    @Test
+    public void testThatACustomerAccountCanBeClosed(){
+    }
+
 }

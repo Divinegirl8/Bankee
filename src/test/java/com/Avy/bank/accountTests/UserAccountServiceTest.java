@@ -26,9 +26,9 @@ public class UserAccountServiceTest {
 
         request.setAccountName("Agboola Tobi Samuel");
         request.setAccountNumber("0000000028");
-        request.setAmount(BigDecimal.valueOf(5000));
+        request.setAmount(BigDecimal.valueOf(2500));
         request.setDescription("School fees");
-        request.setDepositor("Falade Adebola");
+        request.setPerformedBy("Falade Adebola");
         request.setDepositDate("25/06/2024");
 
         UserDepositResponse response = accountService.makeDeposit(request);
@@ -43,7 +43,7 @@ public class UserAccountServiceTest {
         request.setAccountNumber("0000000019");
         request.setAmount(BigDecimal.valueOf(75000));
         request.setDescription("Feeding Allowance");
-        request.setDepositor("Agboola Boluwatife");
+        request.setPerformedBy("Agboola Boluwatife");
         request.setDepositDate("27/06/2024");
 
         UserDepositResponse response = accountService.makeDeposit(request);
@@ -60,7 +60,7 @@ public class UserAccountServiceTest {
         request.setAccountNumber("0000000019");
         request.setAmount(BigDecimal.valueOf(2500));
         request.setDescription("Feeding Allowance");
-        request.setDepositor("Agboola Boluwatife");
+        request.setPerformedBy("Agboola Boluwatife");
         request.setDepositDate("27/06/2024");
 
         UserDepositResponse response = accountService.makeDeposit(request);
@@ -76,7 +76,7 @@ public class UserAccountServiceTest {
         request.setAccountNumber("0000000028");
         request.setAmount(BigDecimal.valueOf(-500));
         request.setDescription("School fees");
-        request.setDepositor("Falade Adebola");
+        request.setPerformedBy("Falade Adebola");
         request.setDepositDate("25/06/2024");
         assertThrows(InvalidAmountException.class,()->accountService.makeDeposit(request));
     }
@@ -95,10 +95,10 @@ public class UserAccountServiceTest {
     @Test
     public void testThatWithdrawalCanBMadeOnAnExistingAccount() throws InvalidAmountException, AccountNumberNotFound {
         UserWithdrawRequest request = new UserWithdrawRequest();
-        request.setAccountNumber("0000000019");
-        request.setAmount(BigDecimal.valueOf(1500));
+        request.setAccountNumber("0000000028");
+        request.setAmount(BigDecimal.valueOf(87000));
         request.setPerformedAt("25/06/2024");
-        request.setAccountName("Agu Sandra");
+        request.setAccountName("Agboola Tobi Samuel");
         request.setPerformedBy("Agu Sandra");
 
 
@@ -143,7 +143,7 @@ public class UserAccountServiceTest {
         ViewTransactionHistory request = new ViewTransactionHistory();
         request.setAccountNumber("0000000019");
 
-        ViewDepositResponse response = accountService.viewAllTransactions(request);
+        ViewTransactionOnAccountResponse response = accountService.viewAllTransactions(request);
         System.out.println(response.getTransactionOnAccount());
         assertThat(response).isNotNull();
     }

@@ -11,9 +11,9 @@ public class UserDepositRequest {
 
     private String accountName;
     private String accountNumber;
+    private String performedBy;
     private BigDecimal amount;
     private String description;
-    private String depositor;
     private String depositDate;
 
 }

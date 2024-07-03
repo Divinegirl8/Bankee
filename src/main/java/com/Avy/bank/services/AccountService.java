@@ -19,6 +19,6 @@ public interface AccountService {
     UserFundTransferResponse transferFund(UserFundTransferRequest request) throws AccountNumberNotFound, InvalidAmountException, CustomException;
 
 
-    ViewDepositResponse viewAllTransactions(ViewTransactionHistory request) throws AccountNumberNotFound;
+    ViewTransactionOnAccountResponse viewAllTransactions(ViewTransactionHistory request) throws AccountNumberNotFound;
 
 }
