@@ -12,10 +12,8 @@ import com.Avy.bank.dtos.responses.UserDepositResponse;
 import com.Avy.bank.dtos.responses.UserFundTransferResponse;
 import com.Avy.bank.dtos.responses.UserWithdrawResponse;
 import com.Avy.bank.exceptions.AccountNumberNotFound;
-import com.Avy.bank.exceptions.CustomException;
 import com.Avy.bank.exceptions.InvalidAmountException;
 import lombok.AllArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -115,30 +113,75 @@ public class AccountServiceApp  implements AccountService {
     }
 
     @Override
-//    public UserFundTransferResponse transferFund(UserFundTransferRequest request) throws AccountNumberNotFound, InvalidAmountException {
-//
+    public UserFundTransferResponse transferFund(UserFundTransferRequest request) throws AccountNumberNotFound, InvalidAmountException {
+    UserAccount existingAccountFrom = getAccount(request.getFromAccount());
+    UserAccount existingAccountTo = getAccount(request.getToAccount());
+    validateTransferAmount(existingAccountFrom, request.getAmount());
+    updateAccountBalances(existingAccountFrom, existingAccountTo, request.getAmount());
+    TransactionOnAccount transactionFrom = createTransaction(existingAccountFrom, request, TransactionType.TRANSFER);
+    TransactionOnAccount transactionTo = createTransaction(existingAccountTo, request, TransactionType.CREDITED);
+
+    transactionService.createTransaction(transactionFrom);
+    transactionService.createTransaction(transactionTo);
+
+    return createResponse(existingAccountFrom, existingAccountTo, request.getAmount());
+    }
+
+
+    private UserAccount getAccount(String accountNumber) throws AccountNumberNotFound {
+    UserAccount account = accountRepository.findByAccountNumber(accountNumber);
+    if (account == null) throw new AccountNumberNotFound("Invalid account number");
+    return account;
+    }
+
+    private void validateTransferAmount(UserAccount account, BigDecimal amount) throws InvalidAmountException {
+    if (account.getBalance().subtract(amount).compareTo(BigDecimal.ZERO) < 1) throw new InvalidAmountException("Insufficient fund");
+    }
+
+    private void updateAccountBalances(UserAccount from, UserAccount to, BigDecimal amount) {
+    from.setBalance(from.getBalance().subtract(amount));
+    to.setBalance(to.getBalance().add(amount));
+    accountRepository.save(from);
+    accountRepository.save(to);
+    }
+
+    private TransactionOnAccount createTransaction(UserAccount account, UserFundTransferRequest request, TransactionType type) {
+    TransactionOnAccount transaction = new TransactionOnAccount();
+    transaction.setAccount(account);
+    transaction.setAccountNumber(account.getAccountNumber());
+    transaction.setAccountName(account.getAccountName());
+    transaction.setAmount(request.getAmount());
+    transaction.setPerformedBy(request.getPerformedBy());
+    transaction.setTransactionType(type);
+    transaction.setStatus(TransactionStatus.SUCCESSFUL);
+    transaction.setDescription(request.getDescription());
+    transaction.setPerformedAt(LocalDateTime.now());
+    return transaction;
+    }
+
+    private UserFundTransferResponse createResponse(UserAccount from, UserAccount to, BigDecimal amount) {
+    UserFundTransferResponse response = new UserFundTransferResponse();
+    response.setStatus(TransactionStatus.SUCCESSFUL);
+    response.setMessage("Dear " + from.getAccountName() + " ,you have successfully transferred " + amount + " to " + to.getAccountNumber());
+    return response;
+    }
+
+
+//    public UserFundTransferResponse transferFund(UserFundTransferRequest request) throws AccountNumberNotFound, InvalidAmountException, CustomException {
 //        UserAccount existingAccountFrom = accountRepository.findByAccountNumber(request.getFromAccount());
 //        if (existingAccountFrom == null) throw new AccountNumberNotFound("Invalid account number");
-//
 //        UserAccount existingAccountTo = accountRepository.findByAccountNumber(request.getToAccount());
 //        if (existingAccountTo == null) throw new AccountNumberNotFound("Invalid account number");
-//
-//        if (existingAccountFrom.getBalance().subtract(request.getAmount()).compareTo(BigDecimal.ZERO) < 1)
-//            throw new InvalidAmountException("Insufficient fund");
-//
-//        List<TransactionOnAccount> existingTransactionOnAccountFrom = existingAccountFrom.getTransactionOnAccountHistory();
-//
-//        List<TransactionOnAccount> existingTransactionOnAccountsTo = existingAccountTo.getTransactionOnAccountHistory();
+//        if (existingAccountFrom.getBalance().subtract(request.getAmount()).compareTo(BigDecimal.ZERO) < 1) throw new InvalidAmountException("Insufficient fund");
 //
 //        existingAccountFrom.setBalance(existingAccountFrom.getBalance().subtract(request.getAmount()));
-//
 //        existingAccountTo.setBalance(existingAccountTo.getBalance().add(request.getAmount()));
+//
 //        accountRepository.save(existingAccountFrom);
 //        accountRepository.save(existingAccountTo);
 //
-//
-//
 //        TransactionOnAccount transactionFrom = new TransactionOnAccount();
+//        transactionFrom.setAccount(existingAccountFrom);
 //        transactionFrom.setAccountNumber(existingAccountFrom.getAccountNumber());
 //        transactionFrom.setAccountName(existingAccountFrom.getAccountName());
 //        transactionFrom.setAmount(request.getAmount());
@@ -147,13 +190,9 @@ public class AccountServiceApp  implements AccountService {
 //        transactionFrom.setStatus(TransactionStatus.SUCCESSFUL);
 //        transactionFrom.setDescription(request.getDescription());
 //        transactionFrom.setPerformedAt(LocalDateTime.now());
-//        existingTransactionOnAccountFrom.add(transactionFrom);
-//        existingAccountFrom.setTransactionOnAccountHistory(existingTransactionOnAccountFrom);
-//
-////        transactionOnAccountService.save(transactionFrom);
-//        transactionRepository.save(transactionFrom);
 //
 //        TransactionOnAccount transactionTo = new TransactionOnAccount();
+//        transactionTo.setAccount(existingAccountTo);
 //        transactionTo.setAccountNumber(existingAccountTo.getAccountNumber());
 //        transactionTo.setAccountName(existingAccountTo.getAccountName());
 //        transactionTo.setAmount(request.getAmount());
@@ -162,72 +201,15 @@ public class AccountServiceApp  implements AccountService {
 //        transactionTo.setStatus(TransactionStatus.SUCCESSFUL);
 //        transactionTo.setDescription(request.getDescription());
 //        transactionTo.setPerformedAt(LocalDateTime.now());
-//        existingTransactionOnAccountsTo.add(transactionTo);
-//        existingTransactionOnAccountsTo.add(transactionTo);
-//        existingAccountTo.setTransactionOnAccountHistory(existingTransactionOnAccountsTo);
 //
-////        transactionOnAccountService.save(transactionTo);
-//
-//        transactionRepository.save(transactionTo);
-//
-//        accountRepository.save(existingAccountFrom);
-//        accountRepository.save(existingAccountTo);
+//        transactionService.createTransaction(transactionFrom);
+//        transactionService.createTransaction(transactionTo);
 //
 //        UserFundTransferResponse response = new UserFundTransferResponse();
 //        response.setStatus(TransactionStatus.SUCCESSFUL);
-//        response.setMessage("Dear " + existingAccountFrom.getAccountName() +
-//                " ,you have successfully transferred "
-//                + request.getAmount() + " to "
-//                + existingAccountTo.getAccountNumber());
+//        response.setMessage("Dear " + existingAccountFrom.getAccountName() + " ,you have successfully transferred " + request.getAmount() + " to " + existingAccountTo.getAccountNumber());
 //        return response;
 //    }
-
-
-
-
-    public UserFundTransferResponse transferFund(UserFundTransferRequest request) throws AccountNumberNotFound, InvalidAmountException, CustomException {
-        UserAccount existingAccountFrom = accountRepository.findByAccountNumber(request.getFromAccount());
-        if (existingAccountFrom == null) throw new AccountNumberNotFound("Invalid account number");
-        UserAccount existingAccountTo = accountRepository.findByAccountNumber(request.getToAccount());
-        if (existingAccountTo == null) throw new AccountNumberNotFound("Invalid account number");
-        if (existingAccountFrom.getBalance().subtract(request.getAmount()).compareTo(BigDecimal.ZERO) < 1) throw new InvalidAmountException("Insufficient fund");
-
-        existingAccountFrom.setBalance(existingAccountFrom.getBalance().subtract(request.getAmount()));
-        existingAccountTo.setBalance(existingAccountTo.getBalance().add(request.getAmount()));
-
-        accountRepository.save(existingAccountFrom);
-        accountRepository.save(existingAccountTo);
-
-        TransactionOnAccount transactionFrom = new TransactionOnAccount();
-        transactionFrom.setAccount(existingAccountFrom);
-        transactionFrom.setAccountNumber(existingAccountFrom.getAccountNumber());
-        transactionFrom.setAccountName(existingAccountFrom.getAccountName());
-        transactionFrom.setAmount(request.getAmount());
-        transactionFrom.setPerformedBy(request.getPerformedBy());
-        transactionFrom.setTransactionType(TransactionType.TRANSFER);
-        transactionFrom.setStatus(TransactionStatus.SUCCESSFUL);
-        transactionFrom.setDescription(request.getDescription());
-        transactionFrom.setPerformedAt(LocalDateTime.now());
-
-        TransactionOnAccount transactionTo = new TransactionOnAccount();
-        transactionTo.setAccount(existingAccountTo);
-        transactionTo.setAccountNumber(existingAccountTo.getAccountNumber());
-        transactionTo.setAccountName(existingAccountTo.getAccountName());
-        transactionTo.setAmount(request.getAmount());
-        transactionTo.setPerformedBy(request.getPerformedBy());
-        transactionTo.setTransactionType(TransactionType.CREDITED);
-        transactionTo.setStatus(TransactionStatus.SUCCESSFUL);
-        transactionTo.setDescription(request.getDescription());
-        transactionTo.setPerformedAt(LocalDateTime.now());
-
-        transactionService.createTransaction(transactionFrom);
-        transactionService.createTransaction(transactionTo);
-
-        UserFundTransferResponse response = new UserFundTransferResponse();
-        response.setStatus(TransactionStatus.SUCCESSFUL);
-        response.setMessage("Dear " + existingAccountFrom.getAccountName() + " ,you have successfully transferred " + request.getAmount() + " to " + existingAccountTo.getAccountNumber());
-        return response;
-    }
 
     @Override
     public UserAccount findByAccountNumber(String fromAccount) {
