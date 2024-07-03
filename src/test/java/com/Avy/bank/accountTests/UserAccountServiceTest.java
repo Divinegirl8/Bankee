@@ -1,13 +1,7 @@
 package com.Avy.bank.accountTests;
 
-import com.Avy.bank.dtos.requests.UserBalanceRequest;
-import com.Avy.bank.dtos.requests.UserDepositRequest;
-import com.Avy.bank.dtos.requests.UserFundTransferRequest;
-import com.Avy.bank.dtos.requests.UserWithdrawRequest;
-import com.Avy.bank.dtos.responses.UserBalanceResponse;
-import com.Avy.bank.dtos.responses.UserDepositResponse;
-import com.Avy.bank.dtos.responses.UserFundTransferResponse;
-import com.Avy.bank.dtos.responses.UserWithdrawResponse;
+import com.Avy.bank.dtos.requests.*;
+import com.Avy.bank.dtos.responses.*;
 import com.Avy.bank.exceptions.AccountNumberNotFound;
 import com.Avy.bank.exceptions.CustomException;
 import com.Avy.bank.exceptions.InvalidAmountException;
@@ -139,8 +133,18 @@ public class UserAccountServiceTest {
         request.setPerformedBy("Agu Sandra");
 
         UserFundTransferResponse response = accountService.transferFund(request);
-        System.out.println(response);
         assertThat(response).isNotNull();
 
+    }
+
+    @Test
+    public void testThatAListOfTransactionsOnAnExistingAccountCanBeFound() throws AccountNumberNotFound {
+
+        ViewTransactionHistory request = new ViewTransactionHistory();
+        request.setAccountNumber("0000000019");
+
+        ViewDepositResponse response = accountService.viewAllTransactions(request);
+        System.out.println(response.getTransactionOnAccount());
+        assertThat(response).isNotNull();
     }
 }

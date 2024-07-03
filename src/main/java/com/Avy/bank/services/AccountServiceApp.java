@@ -7,10 +7,7 @@ import com.Avy.bank.data.models.TransactionOnAccount;
 import com.Avy.bank.data.repositories.AccountRepository;
 import com.Avy.bank.data.repositories.TransactionRepository;
 import com.Avy.bank.dtos.requests.*;
-import com.Avy.bank.dtos.responses.UserBalanceResponse;
-import com.Avy.bank.dtos.responses.UserDepositResponse;
-import com.Avy.bank.dtos.responses.UserFundTransferResponse;
-import com.Avy.bank.dtos.responses.UserWithdrawResponse;
+import com.Avy.bank.dtos.responses.*;
 import com.Avy.bank.exceptions.AccountNumberNotFound;
 import com.Avy.bank.exceptions.InvalidAmountException;
 import lombok.AllArgsConstructor;
@@ -18,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -127,6 +125,20 @@ public class AccountServiceApp  implements AccountService {
     return createResponse(existingAccountFrom, existingAccountTo, request.getAmount());
     }
 
+    @Override
+    public ViewDepositResponse viewAllTransactions(ViewTransactionHistory request) throws AccountNumberNotFound {
+        UserAccount existingAccount = accountRepository.findByAccountNumber(request.getAccountNumber());
+        if (existingAccount == null) throw new AccountNumberNotFound("Invalid account number");
+
+        List<TransactionOnAccount> transactions = existingAccount.getTransactionOnAccountHistory();
+        List<TransactionOnAccount> existingTransactions = new ArrayList<>(transactions);
+        ViewDepositResponse response = new ViewDepositResponse();
+        response.setTransactionOnAccount(existingTransactions);
+        response.setMessage("Dear " + existingAccount.getAccountName() + "here's a list of  deposit transactions on your account: "
+                + response.getTransactionOnAccount());
+        return response;
+    }
+
 
     private UserAccount getAccount(String accountNumber) throws AccountNumberNotFound {
     UserAccount account = accountRepository.findByAccountNumber(accountNumber);
@@ -209,16 +221,6 @@ public class AccountServiceApp  implements AccountService {
 //        response.setStatus(TransactionStatus.SUCCESSFUL);
 //        response.setMessage("Dear " + existingAccountFrom.getAccountName() + " ,you have successfully transferred " + request.getAmount() + " to " + existingAccountTo.getAccountNumber());
 //        return response;
-//    }
-
-    @Override
-    public UserAccount findByAccountNumber(String fromAccount) {
-        return accountRepository.findByAccountNumber(fromAccount);
-    }
-
-//    @Override
-//    public UserAccount findByAccountNumber(ViewDepositRequest request) {
-//        return accountRepository.findByAccountNumber(request.getAccountNumber());
 //    }
 
     private static TransactionOnAccount getTransactionOnAccount(UserDepositRequest request, UserAccount existingUserAccount) {

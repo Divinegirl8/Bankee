@@ -3,6 +3,7 @@ package com.Avy.bank.data.models;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Setter
 @Getter
+@ToString
 public class TransactionOnAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

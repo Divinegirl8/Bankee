@@ -20,30 +20,17 @@ public class TransactionOnAccountServiceApp implements TransactionOnAccountServi
 
     }
 
-
 //    @Override
-//    public ViewDepositResponse viewDeposit(ViewDepositRequest request) throws AccountNumberNotFound {
-//        UserAccount existingAccount = accountRepository.findByAccountNumber(request.getAccountNumber());
+//    public ViewDepositResponse viewAllTransactions(ViewTransactionHistory request) throws AccountNumberNotFound {
+//        UserAccount existingAccount = accountService.findByAccountNumber(request.getAccountNumber());
 //        if (existingAccount == null) throw new AccountNumberNotFound("Invalid account number");
 //
 //        List<TransactionOnAccount> transactions = existingAccount.getTransactionOnAccountHistory();
-//        ArrayList<TransactionOnAccount> existingTransactions = new ArrayList<>();
-//        for (TransactionOnAccount transaction : transactions){
-//            if (transaction.getTransactionType()== TransactionType.DEPOSIT)
-//                existingTransactions.add(transaction);
-//        }
-//        if (existingTransactions.isEmpty()) throw new AccountNumberNotFound("There are not deposit transactions on this account");
+//        List<TransactionOnAccount> existingTransactions = new ArrayList<>(transactions);
 //        ViewDepositResponse response = new ViewDepositResponse();
 //        response.setDeposits(existingTransactions);
 //        response.setMessage("Dear " + existingAccount.getAccountName() + "here's a list of  deposit transactions on your account: "
 //                + response.getDeposits());
 //        return response;
 //    }
-
-//    @Override
-//    public void save(TransactionOnAccount transaction) {
-//        transactionRepository.save(transaction);
-//    }
 }
-
-

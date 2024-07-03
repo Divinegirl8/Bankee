@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 @Getter
 
-public class ViewDepositRequest {
+public class ViewTransactionHistory {
     private String accountNumber;
 }

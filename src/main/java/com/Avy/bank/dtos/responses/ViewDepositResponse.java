@@ -10,5 +10,5 @@ import java.util.List;
 @Getter
 public class ViewDepositResponse {
     private String message;
-    private List<TransactionOnAccount> deposits;
+    private List<TransactionOnAccount> transactionOnAccount;
 }
