@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.IllegalFormatCodePointException;
 import java.util.List;
 
 @Service
@@ -165,7 +164,8 @@ public class AccountServiceApp  implements AccountService {
     @Override
     public UserFundTransferResponse transferFund(UserFundTransferRequest request) throws AccountNumberNotFound, InvalidAmountException, TransactionException {
     UserAccount existingAccountFrom = getAccount(request.getFromAccount());
-    validateAccess(existingAccountFrom);
+        validateTransferAmount(request);
+        validateAccess(existingAccountFrom);
     UserAccount existingAccountTo = getAccount(request.getToAccount());
     validateTransferAmount(existingAccountFrom, request.getAmount());
     updateAccountBalances(existingAccountFrom, existingAccountTo, request.getAmount());
@@ -176,6 +176,10 @@ public class AccountServiceApp  implements AccountService {
     transactionService.createTransaction(transactionTo);
 
     return createResponse(existingAccountFrom, existingAccountTo, request.getAmount());
+    }
+
+    private static void validateTransferAmount(UserFundTransferRequest request) throws InvalidAmountException {
+        if (request.getAmount().compareTo(BigDecimal.ZERO) < 1) throw new InvalidAmountException("Amount must be greater than zero");
     }
 
     @Override

@@ -100,6 +100,19 @@ public class UserAccountServiceTest {
         assertThrows(InvalidAmountException.class,()->accountService.makeWithdrawal(request));
     }
 
+    @Test
+    public void testThatIfARegisteredAccountAttemptsToTransferANegativeAmountExceptionIsThrown(){
+        UserFundTransferRequest request = new UserFundTransferRequest();
+        request.setFromAccount("0000000028");
+        request.setToAccount("0000000019");
+
+        request.setAmount(BigDecimal.valueOf(-500));
+        request.setDescription("Sent for upkeep");
+        request.setPerformedBy("Agu Sandra");
+
+        assertThrows(InvalidAmountException.class,()->accountService.transferFund(request));
+    }
+
 
     @Test
     public void testThatADepositTransactionCanBeExecutedOnAnExistingAccount() throws AccountNumberNotFound, InvalidAmountException, DescriptionException, TransactionException {
