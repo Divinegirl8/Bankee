@@ -31,6 +31,15 @@ public class UserAccountServiceTest {
 
     }
 
+    @Test
+    public void testAnExistingAccountCanBeLoggedOut() throws UserNotFoundException {
+        AccountLogoutRequest request = new AccountLogoutRequest();
+        request.setUserId(2L);
+        AccountLogoutResponse response = accountService.logout(request);
+        System.out.println(response);
+        assertThat(response).isNotNull();
+    }
+
 
     @Test
     public void testThatADepositTransactionCanBeExecutedOnAnExistingAccount() throws AccountNumberNotFound, InvalidAmountException, DescriptionException, TransactionException {
@@ -94,7 +103,7 @@ public class UserAccountServiceTest {
     }
 
     @Test
-    public void  testThatAnExistingAccountBalanceCanBeFound() throws AccountNumberNotFound {
+    public void  testThatAnExistingAccountBalanceCanBeFound() throws AccountNumberNotFound, TransactionException {
         UserBalanceRequest request = new UserBalanceRequest();
         request.setAccountNumber("0000000019");
 
@@ -151,7 +160,7 @@ public class UserAccountServiceTest {
     }
 
     @Test
-    public void testThatAListOfTransactionsOnAnExistingAccountCanBeFound() throws AccountNumberNotFound {
+    public void testThatAListOfTransactionsOnAnExistingAccountCanBeFound() throws AccountNumberNotFound, TransactionException {
 
         ViewTransactionHistory request = new ViewTransactionHistory();
         request.setAccountNumber("0000000019");

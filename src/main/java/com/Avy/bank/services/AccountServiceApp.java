@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.IllegalFormatCodePointException;
 import java.util.List;
 
 @Service
@@ -197,6 +198,17 @@ public class AccountServiceApp  implements AccountService {
         existingAccount.setLogin(true);
         accountRepository.save(existingAccount);
         return getLoginResponse();
+    }
+
+    @Override
+    public AccountLogoutResponse logout(AccountLogoutRequest request) throws UserNotFoundException {
+        UserAccount existingAccount = accountRepository.findById(request.getUserId()).orElse(null);
+        if (existingAccount == null) throw new UserNotFoundException("Account not found");
+        existingAccount.setLogin(false);
+        accountRepository.save(existingAccount);
+        AccountLogoutResponse response = new AccountLogoutResponse();
+        response.setMessage("You have successfully logged out");
+        return response;
     }
 
     private static AccountLoginResponse getLoginResponse() {

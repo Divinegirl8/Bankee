@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class UserLogoutRequest {
+public class AccountLogoutRequest {
     private Long userId;
 }

@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class UserLogoutResponse {
+public class AccountLogoutResponse {
     private String message;
 }

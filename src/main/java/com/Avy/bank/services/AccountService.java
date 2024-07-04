@@ -25,4 +25,6 @@ public interface AccountService {
     void saveUserAccount(UserAccount userAccount);
 
     AccountLoginResponse login(AccountLoginRequest request) throws UserNotFoundException;
+
+    AccountLogoutResponse logout(AccountLogoutRequest request) throws UserNotFoundException;
 }
