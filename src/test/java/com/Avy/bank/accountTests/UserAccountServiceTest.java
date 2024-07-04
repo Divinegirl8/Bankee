@@ -21,7 +21,7 @@ public class UserAccountServiceTest {
     private AccountService accountService;
 
     @Test
-    public void testThatADepositTransactionCanBeExecutedOnAnExistingAccount() throws AccountNumberNotFound, InvalidAmountException {
+    public void testThatADepositTransactionCanBeExecutedOnAnExistingAccount() throws AccountNumberNotFound, InvalidAmountException, DescriptionException {
         UserDepositRequest request = new UserDepositRequest();
 
         request.setAccountName("Agboola Tobi Samuel");
@@ -37,7 +37,7 @@ public class UserAccountServiceTest {
     }
 
     @Test
-    public void testThatADepositTransactionCanBeExecutedOnAnExistingAccount2() throws AccountNumberNotFound, InvalidAmountException {
+    public void testThatADepositTransactionCanBeExecutedOnAnExistingAccount2() throws AccountNumberNotFound, InvalidAmountException, DescriptionException {
         UserDepositRequest request = new UserDepositRequest();
         request.setAccountName("Agu Sandra");
         request.setAccountNumber("0000000019");
@@ -53,7 +53,7 @@ public class UserAccountServiceTest {
     }
 
         @Test
-    public void testThatMultipleDepositsCanBeMadeOnExistingAccount() throws AccountNumberNotFound, InvalidAmountException {
+    public void testThatMultipleDepositsCanBeMadeOnExistingAccount() throws AccountNumberNotFound, InvalidAmountException, DescriptionException {
         UserDepositRequest request = new UserDepositRequest();
 
         request.setAccountName("Agu Sandra");

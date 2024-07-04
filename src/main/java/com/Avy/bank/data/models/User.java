@@ -19,6 +19,7 @@ public class User {
     private String password;
     private String address;
     private String phoneNumber;
+    private boolean isLogin;
     @OneToMany(fetch = FetchType.EAGER)
     private List<UserAccount> userAccount;
     private LocalDateTime createdAt;

@@ -3,9 +3,14 @@ package com.Avy.bank.userTests;
 import com.Avy.bank.data.models.AccountType;
 import com.Avy.bank.data.models.User;
 import com.Avy.bank.data.repositories.UserRepository;
+import com.Avy.bank.dtos.requests.UserLoginRequest;
+import com.Avy.bank.dtos.requests.UserLogoutRequest;
 import com.Avy.bank.dtos.requests.UserRegistrationRequest;
-import com.Avy.bank.dtos.requests.ViewAllCustomersRequest;
+import com.Avy.bank.dtos.responses.UserLoginResponse;
+import com.Avy.bank.dtos.responses.UserLogoutResponse;
 import com.Avy.bank.dtos.responses.UserRegistrationResponse;
+import com.Avy.bank.exceptions.InvalidLoginCredentails;
+import com.Avy.bank.exceptions.InvalidRegistrationDetailsException;
 import com.Avy.bank.exceptions.UserExistException;
 import com.Avy.bank.services.UserService;
 import org.junit.jupiter.api.Test;
@@ -27,11 +32,11 @@ public class UserServiceTest {
 
     @Test
 
-    public void testThatAUserCanRegister() throws UserExistException {
+    public void testThatAUserCanRegister() throws UserExistException, InvalidRegistrationDetailsException {
         UserRegistrationRequest request = new UserRegistrationRequest();
         request.setFullName("Agboola Tobi Samuel");
         request.setEmail("tobi4tee@gmail.com");
-        request.setPassword("password");
+        request.setPassword("Agboola1234@.");
         request.setAddress("312, Sabo Yaba. Lagos");
         request.setPhoneNumber("08068952954");
         request.setAccountType(AccountType.SAVINGS);
@@ -41,11 +46,11 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testThatMultipleUsersCanRegister() throws UserExistException {
+    public void testThatMultipleUsersCanRegister() throws UserExistException, InvalidRegistrationDetailsException {
         UserRegistrationRequest request = new UserRegistrationRequest();
-        request.setFullName("Agu Sandra");
-        request.setEmail("agu.sandra@gmail.com");
-        request.setPassword("agu1234Sandra");
+        request.setFullName("Vera Ezeagu");
+        request.setEmail("agusandra@gmail.com");
+        request.setPassword("Veraeze1234@2.");
         request.setAddress("312, Ikoyi. Lagos");
         request.setPhoneNumber("08165437288");
         request.setAccountType(AccountType.CURRENT);
@@ -59,9 +64,9 @@ public class UserServiceTest {
 
     public void testThatARegisteredUserCannotRegister(){
         UserRegistrationRequest request = new UserRegistrationRequest();
-        request.setFullName("Agu Sandra");
-        request.setEmail("agu.sandra@gmail.com");
-        request.setPassword("agu1234Sandra");
+        request.setFullName("Vera Ezeagu");
+        request.setEmail("agusandra@gmail.com");
+        request.setPassword("Veraeze1234@2.");
         request.setAddress("312, Ikoyi. Lagos");
         request.setPhoneNumber("08165437288");
         request.setAccountType(AccountType.CURRENT);
@@ -71,13 +76,43 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testThatAllCustomersCanBeFound(){
-        List<User> allExistingUsers = userRepository.findAll();
-        assertThat(allExistingUsers).isNotNull();
+    public void testThatARegisteredUserCanLogin() throws InvalidLoginCredentails {
+        UserLoginRequest request = new UserLoginRequest();
+        request.setEmail("agusandra@gmail.com");
+        request.setPassword("Veraeze1234@2.");
+
+        UserLoginResponse response = userService.login(request);
+        assertThat(response).isNotNull();
+
     }
 
     @Test
-    public void testThatACustomerAccountCanBeClosed(){
+    public void testThatMultipleRegisteredUserCanLogin() throws InvalidLoginCredentails {
+        UserLoginRequest request = new UserLoginRequest();
+        request.setEmail("tobi4tee@gmail.com");
+        request.setPassword("Agboola1234@.");
+
+        UserLoginResponse response = userService.login(request);
+        assertThat(response).isNotNull();
+
+    }
+
+
+    @Test
+    public void testThatARegisteredUserCanLogout(){
+        UserLogoutRequest request = new UserLogoutRequest();
+        request.setUserId(1L);
+        UserLogoutResponse response = userService.logout(request);
+        assertThat(response).isNotNull();
+    }
+
+
+
+
+    @Test
+    public void testThatAllCustomersCanBeFound(){
+        List<User> allExistingUsers = userRepository.findAll();
+        assertThat(allExistingUsers).isNotNull();
     }
 
 }

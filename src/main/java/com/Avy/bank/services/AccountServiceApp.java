@@ -9,6 +9,7 @@ import com.Avy.bank.dtos.requests.*;
 import com.Avy.bank.dtos.responses.*;
 import com.Avy.bank.exceptions.AccountNumberNotFound;
 import com.Avy.bank.exceptions.InvalidAmountException;
+import com.Avy.bank.utils.Validation;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +27,19 @@ public class AccountServiceApp  implements AccountService {
     private final TransactionOnAccountService transactionService;
 
     @Override
-    public UserDepositResponse makeDeposit(UserDepositRequest request) throws AccountNumberNotFound, InvalidAmountException {
+    public UserDepositResponse makeDeposit(UserDepositRequest request) throws AccountNumberNotFound, InvalidAmountException, DescriptionException {
         UserAccount existingUserAccount = retrieveAccount(request.getAccountNumber(), request.getAccountName());
+        validateDescription(request);
+
         validateDepositAmount(request.getAmount());
         TransactionOnAccount transaction = createTransaction(request, existingUserAccount);
         updateAccountBalanceAndTransactionHistory(existingUserAccount, transaction);
         accountRepository.save(existingUserAccount);
         return createResponse(transaction, existingUserAccount);
+    }
+
+    private static void validateDescription(UserDepositRequest request) throws DescriptionException {
+        if (Validation.validateDescription(request.getDescription())) throw new DescriptionException("Transaction description cannot be less than 1 character nor greater than 500 character");
     }
 
     private UserAccount retrieveAccount(String accountNumber, String accountName) throws AccountNumberNotFound {
@@ -166,6 +173,11 @@ public class AccountServiceApp  implements AccountService {
         response.setMessage("Dear " + existingAccount.getAccountName() + "here's a list of  deposit transactions on your account: "
                 + response.getTransactionOnAccount());
         return response;
+    }
+
+    @Override
+    public void createAccount(UserAccount userAccount) {
+        accountRepository.save(userAccount);
     }
 
 
