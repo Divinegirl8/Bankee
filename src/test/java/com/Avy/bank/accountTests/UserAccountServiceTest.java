@@ -2,9 +2,7 @@ package com.Avy.bank.accountTests;
 
 import com.Avy.bank.dtos.requests.*;
 import com.Avy.bank.dtos.responses.*;
-import com.Avy.bank.exceptions.AccountNumberNotFound;
-import com.Avy.bank.exceptions.CustomException;
-import com.Avy.bank.exceptions.InvalidAmountException;
+import com.Avy.bank.exceptions.*;
 import com.Avy.bank.services.AccountService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +19,21 @@ public class UserAccountServiceTest {
     private AccountService accountService;
 
     @Test
-    public void testThatADepositTransactionCanBeExecutedOnAnExistingAccount() throws AccountNumberNotFound, InvalidAmountException, DescriptionException {
+    public void testAnExistingAccountCanBeLoggedInTo() throws UserNotFoundException {
+        AccountLoginRequest request = new AccountLoginRequest();
+        request.setEmail("tobi4tee@gmail.com");
+        request.setPassword("Agboola1234@.");
+
+        AccountLoginResponse response = accountService.login(request);
+        System.out.println(response);
+        assertThat(response).isNotNull();
+
+
+    }
+
+
+    @Test
+    public void testThatADepositTransactionCanBeExecutedOnAnExistingAccount() throws AccountNumberNotFound, InvalidAmountException, DescriptionException, TransactionException {
         UserDepositRequest request = new UserDepositRequest();
 
         request.setAccountName("Agboola Tobi Samuel");
@@ -37,7 +49,7 @@ public class UserAccountServiceTest {
     }
 
     @Test
-    public void testThatADepositTransactionCanBeExecutedOnAnExistingAccount2() throws AccountNumberNotFound, InvalidAmountException, DescriptionException {
+    public void testThatADepositTransactionCanBeExecutedOnAnExistingAccount2() throws AccountNumberNotFound, InvalidAmountException, DescriptionException, TransactionException {
         UserDepositRequest request = new UserDepositRequest();
         request.setAccountName("Agu Sandra");
         request.setAccountNumber("0000000019");
@@ -53,7 +65,7 @@ public class UserAccountServiceTest {
     }
 
         @Test
-    public void testThatMultipleDepositsCanBeMadeOnExistingAccount() throws AccountNumberNotFound, InvalidAmountException, DescriptionException {
+    public void testThatMultipleDepositsCanBeMadeOnExistingAccount() throws AccountNumberNotFound, InvalidAmountException, DescriptionException, TransactionException {
         UserDepositRequest request = new UserDepositRequest();
 
         request.setAccountName("Agu Sandra");
@@ -93,7 +105,7 @@ public class UserAccountServiceTest {
     }
 
     @Test
-    public void testThatWithdrawalCanBMadeOnAnExistingAccount() throws InvalidAmountException, AccountNumberNotFound {
+    public void testThatWithdrawalCanBMadeOnAnExistingAccount() throws InvalidAmountException, AccountNumberNotFound, TransactionException {
         UserWithdrawRequest request = new UserWithdrawRequest();
         request.setAccountNumber("0000000028");
         request.setAmount(BigDecimal.valueOf(4000));
@@ -109,7 +121,7 @@ public class UserAccountServiceTest {
 
     }
     @Test
-    public void testThatMultipleWithdrawalCanBePerformedOnAnExistingAccount() throws InvalidAmountException, AccountNumberNotFound {
+    public void testThatMultipleWithdrawalCanBePerformedOnAnExistingAccount() throws InvalidAmountException, AccountNumberNotFound, TransactionException {
         UserWithdrawRequest request = new UserWithdrawRequest();
         request.setAccountNumber("0000000019");
         request.setAmount(BigDecimal.valueOf(1550));
@@ -124,7 +136,7 @@ public class UserAccountServiceTest {
     }
 
     @Test
-    public void testThatFundTransferCanBeMadeBetweenTwoExistingAccounts() throws AccountNumberNotFound, InvalidAmountException, CustomException {
+    public void testThatFundTransferCanBeMadeBetweenTwoExistingAccounts() throws AccountNumberNotFound, InvalidAmountException, CustomException, TransactionException {
         UserFundTransferRequest request = new UserFundTransferRequest();
         request.setFromAccount("0000000019");
         request.setToAccount("0000000028");

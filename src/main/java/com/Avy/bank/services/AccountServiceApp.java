@@ -1,14 +1,13 @@
 package com.Avy.bank.services;
 
-import com.Avy.bank.data.models.TransactionStatus;
-import com.Avy.bank.data.models.TransactionType;
-import com.Avy.bank.data.models.UserAccount;
-import com.Avy.bank.data.models.TransactionOnAccount;
+import com.Avy.bank.data.models.*;
 import com.Avy.bank.data.repositories.AccountRepository;
 import com.Avy.bank.dtos.requests.*;
 import com.Avy.bank.dtos.responses.*;
 import com.Avy.bank.exceptions.AccountNumberNotFound;
 import com.Avy.bank.exceptions.InvalidAmountException;
+import com.Avy.bank.exceptions.TransactionException;
+import com.Avy.bank.exceptions.UserNotFoundException;
 import com.Avy.bank.utils.Validation;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,25 +26,31 @@ public class AccountServiceApp  implements AccountService {
     private final TransactionOnAccountService transactionService;
 
     @Override
-    public UserDepositResponse makeDeposit(UserDepositRequest request) throws AccountNumberNotFound, InvalidAmountException, DescriptionException {
+    public UserDepositResponse makeDeposit(UserDepositRequest request) throws InvalidAmountException, DescriptionException, TransactionException {
         UserAccount existingUserAccount = retrieveAccount(request.getAccountNumber(), request.getAccountName());
-        validateDescription(request);
-
-        validateDepositAmount(request.getAmount());
+        validateAccess(existingUserAccount);
+        validateTransactionRequest(request);
         TransactionOnAccount transaction = createTransaction(request, existingUserAccount);
         updateAccountBalanceAndTransactionHistory(existingUserAccount, transaction);
         accountRepository.save(existingUserAccount);
         return createResponse(transaction, existingUserAccount);
     }
 
-    private static void validateDescription(UserDepositRequest request) throws DescriptionException {
-        if (Validation.validateDescription(request.getDescription())) throw new DescriptionException("Transaction description cannot be less than 1 character nor greater than 500 character");
+    private static void validateAccess(UserAccount existingUserAccount) throws TransactionException {
+        if (!existingUserAccount.isLogin()) throw new TransactionException("Login to process");
     }
 
-    private UserAccount retrieveAccount(String accountNumber, String accountName) throws AccountNumberNotFound {
-        UserAccount account = accountRepository.findByAccountNumber(accountNumber);
-        if (account == null || !account.getAccountName().equals(accountName)) throw new AccountNumberNotFound("Account not found or name not matched");
-        return account;
+    private UserAccount retrieveAccount(String accountNumber, String accountName){
+        return accountRepository.findByAccountNumberAndAccountName(accountNumber, accountName);
+    }
+
+    private void validateTransactionRequest(UserDepositRequest request) throws InvalidAmountException, DescriptionException {
+        validateDescription(request);
+        validateDepositAmount(request.getAmount());
+    }
+
+    private void validateDescription(UserDepositRequest request) throws DescriptionException {
+        if (Validation.validateDescription(request.getDescription())) throw new DescriptionException("Transaction description cannot be less than 1 character nor greater than 500 character");
     }
 
     private void validateDepositAmount(BigDecimal amount) throws InvalidAmountException {
@@ -80,11 +85,12 @@ public class AccountServiceApp  implements AccountService {
 
 
 
-    @Override
-    public UserBalanceResponse checkBalance(UserBalanceRequest request) throws AccountNumberNotFound {
 
+@Override
+    public UserBalanceResponse checkBalance(UserBalanceRequest request) throws AccountNumberNotFound, TransactionException {
         UserAccount existingAccount = accountRepository.findByAccountNumber(request.getAccountNumber());
         if (existingAccount==null) throw new AccountNumberNotFound("Invalid account number");
+        validateAccess(existingAccount);
         BigDecimal balance = existingAccount.getBalance();
         UserBalanceResponse response = new UserBalanceResponse();
         response.setBalance(balance);
@@ -93,8 +99,9 @@ public class AccountServiceApp  implements AccountService {
     }
 
     @Override
-    public UserWithdrawResponse makeWithdrawal(UserWithdrawRequest request) throws InvalidAmountException, AccountNumberNotFound {
+    public UserWithdrawResponse makeWithdrawal(UserWithdrawRequest request) throws InvalidAmountException, AccountNumberNotFound, TransactionException {
         UserAccount existingUserAccount = getAccount(request.getAccountNumber(), request.getAccountName());
+        validateAccess(existingUserAccount);
         validateWithdrawalAmount(request.getAmount(), existingUserAccount.getBalance());
         existingUserAccount.setBalance(subtractBalance(existingUserAccount, request.getAmount()));
         TransactionOnAccount transaction = createTransaction(existingUserAccount, request);
@@ -104,6 +111,7 @@ public class AccountServiceApp  implements AccountService {
     }
 
     private UserAccount getAccount(String accountNumber, String accountName) throws AccountNumberNotFound {
+
         UserAccount account = accountRepository.findByAccountNumber(accountNumber);
         if (account == null || !account.getAccountName().equals(accountName)) throw new AccountNumberNotFound("Invalid account details");
         return account;
@@ -147,8 +155,9 @@ public class AccountServiceApp  implements AccountService {
 
 
     @Override
-    public UserFundTransferResponse transferFund(UserFundTransferRequest request) throws AccountNumberNotFound, InvalidAmountException {
+    public UserFundTransferResponse transferFund(UserFundTransferRequest request) throws AccountNumberNotFound, InvalidAmountException, TransactionException {
     UserAccount existingAccountFrom = getAccount(request.getFromAccount());
+    validateAccess(existingAccountFrom);
     UserAccount existingAccountTo = getAccount(request.getToAccount());
     validateTransferAmount(existingAccountFrom, request.getAmount());
     updateAccountBalances(existingAccountFrom, existingAccountTo, request.getAmount());
@@ -162,9 +171,10 @@ public class AccountServiceApp  implements AccountService {
     }
 
     @Override
-    public ViewTransactionOnAccountResponse viewAllTransactions(ViewTransactionHistory request) throws AccountNumberNotFound {
+    public ViewTransactionOnAccountResponse viewAllTransactions(ViewTransactionHistory request) throws AccountNumberNotFound, TransactionException {
         UserAccount existingAccount = accountRepository.findByAccountNumber(request.getAccountNumber());
         if (existingAccount == null) throw new AccountNumberNotFound("Invalid account number");
+        validateAccess(existingAccount);
 
         List<TransactionOnAccount> transactions = existingAccount.getTransactionOnAccountHistory();
         List<TransactionOnAccount> existingTransactions = new ArrayList<>(transactions);
@@ -176,10 +186,29 @@ public class AccountServiceApp  implements AccountService {
     }
 
     @Override
-    public void createAccount(UserAccount userAccount) {
+    public void saveUserAccount(UserAccount userAccount) {
         accountRepository.save(userAccount);
     }
 
+    @Override
+    public AccountLoginResponse login(AccountLoginRequest request) throws UserNotFoundException {
+        UserAccount existingAccount = accountRepository.findByAccountEmail(request.getEmail());
+        validateLoginCredentials(request, existingAccount);
+        existingAccount.setLogin(true);
+        accountRepository.save(existingAccount);
+        return getLoginResponse();
+    }
+
+    private static AccountLoginResponse getLoginResponse() {
+        AccountLoginResponse response = new AccountLoginResponse();
+        response.setMessage("You have successfully logged in");
+        return response;
+    }
+
+    private static void validateLoginCredentials(AccountLoginRequest request, UserAccount existingAccount) throws UserNotFoundException {
+        if (existingAccount == null) throw new UserNotFoundException("Invalid login details");
+        if (!existingAccount.getAccountPassword().equals(request.getPassword())) throw new UserNotFoundException("Invalid login details");
+    }
 
     private UserAccount getAccount(String accountNumber) throws AccountNumberNotFound {
     UserAccount account = accountRepository.findByAccountNumber(accountNumber);
