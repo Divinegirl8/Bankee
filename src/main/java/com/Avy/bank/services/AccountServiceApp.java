@@ -79,7 +79,9 @@ public class AccountServiceApp  implements AccountService {
     private UserDepositResponse createResponse(TransactionOnAccount transaction, UserAccount existingUserAccount) {
         UserDepositResponse response = new UserDepositResponse();
         response.setTransactionId(transaction.getId());
-        response.setMessage("Dear " + transaction.getPerformedBy() + " you have deposited N" + transaction.getAmount() + " into " + existingUserAccount.getAccountNumber() + ". Your transaction Id is: " + transaction.getId() + ". Thanks you for banking with us!");
+        response.setMessage("Dear " + transaction.getPerformedBy() + " you have deposited N" + transaction.getAmount() + " into "
+                + existingUserAccount.getAccountNumber() + ". Your transaction Id is: " + transaction.getId() +
+                ". Thanks you for banking with us!");
         return response;
     }
 
@@ -102,6 +104,7 @@ public class AccountServiceApp  implements AccountService {
     @Override
     public UserWithdrawResponse makeWithdrawal(UserWithdrawRequest request) throws InvalidAmountException, AccountNumberNotFound, TransactionException {
         UserAccount existingUserAccount = getAccount(request.getAccountNumber(), request.getAccountName());
+        validateAmount(request);
         validateAccess(existingUserAccount);
         validateWithdrawalAmount(request.getAmount(), existingUserAccount.getBalance());
         existingUserAccount.setBalance(subtractBalance(existingUserAccount, request.getAmount()));
@@ -109,6 +112,10 @@ public class AccountServiceApp  implements AccountService {
         transactionService.createTransaction(transaction);
         updateAccountTransactionHistory(existingUserAccount, transaction);
         return createResponse(existingUserAccount);
+    }
+
+    private static void validateAmount(UserWithdrawRequest request) throws InvalidAmountException {
+        if (request.getAmount().compareTo(BigDecimal.ZERO) < 1) throw new InvalidAmountException("Amount must be greater than zero");
     }
 
     private UserAccount getAccount(String accountNumber, String accountName) throws AccountNumberNotFound {

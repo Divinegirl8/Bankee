@@ -40,6 +40,66 @@ public class UserAccountServiceTest {
         assertThat(response).isNotNull();
     }
 
+    @Test
+    public void testThatIfALoggedOutExistingAccountAttemptsToDepositExceptionIsThrown(){
+        UserDepositRequest request = new UserDepositRequest();
+        request.setAccountName("Agboola Tobi Samuel");
+        request.setAccountNumber("0000000028");
+        request.setAmount(BigDecimal.valueOf(2500));
+        request.setDescription("School fees");
+        request.setPerformedBy("Falade Adebola");
+        request.setDepositDate("25/06/2024");
+        assertThrows(TransactionException.class,()->accountService.makeDeposit(request));
+
+    }
+
+    @Test
+    public void testThatIfALoggedOutExistingAccountAttemptsToWithdrawExceptionIsThrown(){
+        UserWithdrawRequest request = new UserWithdrawRequest();
+        request.setAccountNumber("0000000028");
+        request.setAmount(BigDecimal.valueOf(4000));
+        request.setPerformedAt("25/06/2024");
+        request.setDescription("Upkeep");
+        request.setAccountName("Agboola Tobi Samuel");
+        request.setPerformedBy("Agu Sandra");
+        assertThrows(TransactionException.class,()->accountService.makeWithdrawal(request));
+
+    }
+
+    @Test
+    public void testThatIfALoggedOutExistingAccountAttemptsToTransferExceptionIsThrown(){
+        UserFundTransferRequest request = new UserFundTransferRequest();
+        request.setFromAccount("0000000019");
+        request.setToAccount("0000000028");
+
+        request.setAmount(BigDecimal.valueOf(7500));
+        request.setDescription("Sent for upkeep");
+        request.setPerformedBy("Agu Sandra");
+        assertThrows(TransactionException.class,()->accountService.transferFund(request));
+
+    }
+
+    @Test
+    public void testThatIfALoggedOutExistingAccountAttemptsToCheckBalanceExceptionIsThrown(){
+        UserBalanceRequest request = new UserBalanceRequest();
+        request.setAccountNumber("0000000019");
+
+        assertThrows(TransactionException.class,()->accountService.checkBalance(request));
+
+    }
+
+    @Test
+    public void testThatIfARegisteredAccountAttemptsToWithdrawANegativeAccountExceptionIsThrown(){
+        UserWithdrawRequest request = new UserWithdrawRequest();
+        request.setAccountNumber("0000000028");
+        request.setAmount(BigDecimal.valueOf(-4000));
+        request.setPerformedAt("25/06/2024");
+        request.setDescription("Upkeep");
+        request.setAccountName("Agboola Tobi Samuel");
+        request.setPerformedBy("Agu Sandra");
+        assertThrows(InvalidAmountException.class,()->accountService.makeWithdrawal(request));
+    }
+
 
     @Test
     public void testThatADepositTransactionCanBeExecutedOnAnExistingAccount() throws AccountNumberNotFound, InvalidAmountException, DescriptionException, TransactionException {
