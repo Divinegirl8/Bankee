@@ -2,6 +2,7 @@ package com.Avy.bank.services;
 
 import com.Avy.bank.data.models.UserAccount;
 import com.Avy.bank.data.models.User;
+import com.Avy.bank.data.repositories.AccountRepository;
 import com.Avy.bank.data.repositories.UserRepository;
 import com.Avy.bank.dtos.requests.UserRegistrationRequest;
 import com.Avy.bank.dtos.responses.UserRegistrationResponse;
@@ -21,12 +22,17 @@ public class UserServiceApp implements UserService{
 
     private final UserRepository userRepository;
     private final AccountService accountService;
+    private final AccountRepository accountRepository;
 
 
     @Override
     public UserRegistrationResponse register(UserRegistrationRequest request) throws UserExistException, InvalidRegistrationDetailsException {
-        if (isUserAlreadyRegistered(request.getEmail())) throw new UserExistException("User already exist");
-        if (!areRegistrationDetailsValid(request)) throw new InvalidRegistrationDetailsException("");
+        if (isUserAlreadyRegistered(request.getEmail())) {
+            throw new UserExistException("User already exist");
+        }
+        if (!areRegistrationDetailsValid(request)) {
+            throw new InvalidRegistrationDetailsException("");
+        }
         User newUser = createUser(request);
         UserAccount userAccount = createUserAccount(request, newUser);
         saveUser(newUser);
@@ -61,7 +67,13 @@ public class UserServiceApp implements UserService{
         userAccount.setAccountEmail(user.getEmail());
         userAccount.setAccountPassword(user.getPassword());
         userAccount.setAccountType(request.getAccountType());
-        userAccount.setAccountNumber(AccountNumberGenerator.generateAccountNumber());
+
+        String generatedAccountNumber;
+        do {
+            generatedAccountNumber = AccountNumberGenerator.generateAccountNumber();
+        } while (accountRepository.findByAccountNumber(generatedAccountNumber) != null);
+
+        userAccount.setAccountNumber(generatedAccountNumber);
         userAccount.setBalance(BigDecimal.valueOf(0));
         userAccount.setCreatedAt(LocalDateTime.now());
         return userAccount;

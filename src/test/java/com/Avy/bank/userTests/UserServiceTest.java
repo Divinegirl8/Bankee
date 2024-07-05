@@ -3,6 +3,7 @@ package com.Avy.bank.userTests;
 import com.Avy.bank.data.models.AccountType;
 import com.Avy.bank.data.models.User;
 import com.Avy.bank.data.repositories.UserRepository;
+import com.Avy.bank.dtos.requests.UpdateUserAccountRequest;
 import com.Avy.bank.dtos.requests.UserRegistrationRequest;
 import com.Avy.bank.dtos.responses.UserRegistrationResponse;
 import com.Avy.bank.exceptions.InvalidRegistrationDetailsException;
@@ -44,7 +45,7 @@ public class UserServiceTest {
     public void testThatMultipleUsersCanRegister() throws UserExistException, InvalidRegistrationDetailsException {
         UserRegistrationRequest request = new UserRegistrationRequest();
         request.setFullName("Vera Ezeagu");
-        request.setEmail("agusandra@gmail.com");
+        request.setEmail("veraeze@gmail.com");
         request.setPassword("Veraeze1234@2.");
         request.setAddress("312, Ikoyi. Lagos");
         request.setPhoneNumber("08165437288");
@@ -60,7 +61,7 @@ public class UserServiceTest {
     public void testThatARegisteredUserCannotRegister(){
         UserRegistrationRequest request = new UserRegistrationRequest();
         request.setFullName("Vera Ezeagu");
-        request.setEmail("agusandra@gmail.com");
+        request.setEmail("veraeze@gmail.com");
         request.setPassword("Veraeze1234@2.");
         request.setAddress("312, Ikoyi. Lagos");
         request.setPhoneNumber("08165437288");
@@ -73,7 +74,22 @@ public class UserServiceTest {
     @Test
     public void testThatAllCustomersCanBeFound(){
         List<User> allExistingUsers = userRepository.findAll();
+        System.out.println(allExistingUsers);
         assertThat(allExistingUsers).isNotNull();
     }
+
+//    @Test
+//    public void testThatCanAccountDetailsCanBeUpdated(){
+//        UpdateUserAccountRequest request = new UpdateUserAccountRequest();
+//        request.setExistingEmail("agusandra@gmail.com");
+//        request.setPassword("Veraeze1234@2.");
+//        request.setNewFullName("Vera Ezeagu Ijioma");
+//        request.setNewAddress("");
+//        request.setNewAddress("");
+//        request.setNewPassword("");
+//        request.setNewPhoneNumber("");
+//        request.setNewAccountType(AccountType.);
+//
+//    }
 
 }

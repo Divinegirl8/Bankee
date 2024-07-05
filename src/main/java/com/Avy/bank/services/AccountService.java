@@ -20,7 +20,6 @@ public interface AccountService {
 
     ViewTransactionOnAccountResponse viewAllTransactions(ViewTransactionHistory request) throws AccountNumberNotFound, TransactionException;
 
-//    void createAccount(UserAccount userAccount);
 
     void saveUserAccount(UserAccount userAccount);
 

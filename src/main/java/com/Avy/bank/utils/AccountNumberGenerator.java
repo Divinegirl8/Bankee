@@ -1,7 +1,5 @@
 package com.Avy.bank.utils;
 
-import java.util.UUID;
-
 
 public class AccountNumberGenerator {
     private static final int COUNTER_START = 1;
@@ -30,8 +28,7 @@ public class AccountNumberGenerator {
             alternate = !alternate;
         }
 
-        int checksumDigit = (10 - (sum % 10)) % 10;
-        return checksumDigit;
+        return (10 - (sum % 10)) % 10;
     }
 
 }

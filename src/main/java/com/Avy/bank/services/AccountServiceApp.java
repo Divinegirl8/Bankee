@@ -29,15 +29,16 @@ public class AccountServiceApp  implements AccountService {
     public UserDepositResponse makeDeposit(UserDepositRequest request) throws InvalidAmountException, DescriptionException, TransactionException {
         UserAccount existingUserAccount = retrieveAccount(request.getAccountNumber(), request.getAccountName());
         validateAccess(existingUserAccount);
-        validateTransactionRequest(request);
+
         TransactionOnAccount transaction = createTransaction(request, existingUserAccount);
+        validateTransactionRequest(request);
         updateAccountBalanceAndTransactionHistory(existingUserAccount, transaction);
         accountRepository.save(existingUserAccount);
         return createResponse(transaction, existingUserAccount);
     }
 
     private static void validateAccess(UserAccount existingUserAccount) throws TransactionException {
-        if (!existingUserAccount.isLogin()) throw new TransactionException("Login to process");
+        if (!existingUserAccount.isLogin()) throw new TransactionException("Login to proceed");
     }
 
     private UserAccount retrieveAccount(String accountNumber, String accountName){
@@ -47,6 +48,7 @@ public class AccountServiceApp  implements AccountService {
     private void validateTransactionRequest(UserDepositRequest request) throws InvalidAmountException, DescriptionException {
         validateDescription(request);
         validateDepositAmount(request.getAmount());
+
     }
 
     private void validateDescription(UserDepositRequest request) throws DescriptionException {
@@ -54,7 +56,9 @@ public class AccountServiceApp  implements AccountService {
     }
 
     private void validateDepositAmount(BigDecimal amount) throws InvalidAmountException {
-        if (amount.compareTo(BigDecimal.ZERO) < 1) throw new InvalidAmountException("Amount must be greater than zero");
+
+        if (amount.compareTo(BigDecimal.ZERO) < 1) throw new InvalidAmountException("Amount must be greater than zero",TransactionStatus.FAILED);
+
     }
 
     private TransactionOnAccount createTransaction(UserDepositRequest request, UserAccount existingUserAccount) {
@@ -63,6 +67,7 @@ public class AccountServiceApp  implements AccountService {
         transaction.setAmount(request.getAmount());
         transaction.setTransactionType(TransactionType.DEPOSIT);
         transaction.setAccountName(request.getAccountName());
+        transaction.setAccount(existingUserAccount);
         transaction.setPerformedBy(request.getPerformedBy());
         transaction.setStatus(TransactionStatus.SUCCESSFUL);
         transaction.setDescription(request.getDescription());
@@ -114,7 +119,7 @@ public class AccountServiceApp  implements AccountService {
     }
 
     private static void validateAmount(UserWithdrawRequest request) throws InvalidAmountException {
-        if (request.getAmount().compareTo(BigDecimal.ZERO) < 1) throw new InvalidAmountException("Amount must be greater than zero");
+        if (request.getAmount().compareTo(BigDecimal.ZERO) < 1) throw new InvalidAmountException("Amount must be greater than zero",TransactionStatus.FAILED);
     }
 
     private UserAccount getAccount(String accountNumber, String accountName) throws AccountNumberNotFound {
@@ -125,7 +130,7 @@ public class AccountServiceApp  implements AccountService {
     }
 
     private void validateWithdrawalAmount(BigDecimal amount, BigDecimal balance) throws InvalidAmountException {
-        if (amount.subtract(balance).equals(BigDecimal.ZERO)) throw new InvalidAmountException("Insufficient balance");
+        if (amount.subtract(balance).equals(BigDecimal.ZERO)) throw new InvalidAmountException("Insufficient balance",TransactionStatus.FAILED);
     }
 
     private BigDecimal subtractBalance(UserAccount account, BigDecimal amount) {
@@ -140,7 +145,7 @@ public class AccountServiceApp  implements AccountService {
         transaction.setAccountName(request.getAccountName());
         transaction.setStatus(TransactionStatus.SUCCESSFUL);
         transaction.setDescription(request.getDescription());
-        transaction.setPerformedBy(request.getPerformedBy());
+        transaction.setPerformedBy(account.getAccountName());
         transaction.setAccount(account);
         transaction.setPerformedAt(LocalDateTime.now());
         return transaction;
@@ -179,7 +184,7 @@ public class AccountServiceApp  implements AccountService {
     }
 
     private static void validateTransferAmount(UserFundTransferRequest request) throws InvalidAmountException {
-        if (request.getAmount().compareTo(BigDecimal.ZERO) < 1) throw new InvalidAmountException("Amount must be greater than zero");
+        if (request.getAmount().compareTo(BigDecimal.ZERO) < 1) throw new InvalidAmountException("Amount must be greater than zero",TransactionStatus.FAILED);
     }
 
     @Override
@@ -240,7 +245,7 @@ public class AccountServiceApp  implements AccountService {
     }
 
     private void validateTransferAmount(UserAccount account, BigDecimal amount) throws InvalidAmountException {
-    if (account.getBalance().subtract(amount).compareTo(BigDecimal.ZERO) < 1) throw new InvalidAmountException("Insufficient fund");
+    if (account.getBalance().subtract(amount).compareTo(BigDecimal.ZERO) < 1) throw new InvalidAmountException("Insufficient fund",TransactionStatus.FAILED);
     }
 
     private void updateAccountBalances(UserAccount from, UserAccount to, BigDecimal amount) {
