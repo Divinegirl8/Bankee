@@ -3,7 +3,6 @@ package com.Avy.bank.userTests;
 import com.Avy.bank.data.models.AccountType;
 import com.Avy.bank.data.models.User;
 import com.Avy.bank.data.repositories.UserRepository;
-import com.Avy.bank.dtos.requests.UpdateUserAccountRequest;
 import com.Avy.bank.dtos.requests.UserRegistrationRequest;
 import com.Avy.bank.dtos.responses.UserRegistrationResponse;
 import com.Avy.bank.exceptions.InvalidRegistrationDetailsException;
