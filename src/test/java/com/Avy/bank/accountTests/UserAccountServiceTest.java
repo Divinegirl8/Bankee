@@ -159,7 +159,6 @@ public class UserAccountServiceTest {
     }
 
 
-
     @Test
     public void testThatIfARegisteredAccountAttemptsToWithdrawANegativeAccountExceptionIsThrown(){
         UserWithdrawRequest request = new UserWithdrawRequest();
