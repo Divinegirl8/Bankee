@@ -3,10 +3,13 @@ package com.Avy.bank.userTests;
 import com.Avy.bank.data.models.AccountType;
 import com.Avy.bank.data.models.User;
 import com.Avy.bank.data.repositories.UserRepository;
+import com.Avy.bank.dtos.requests.OpenAccountRequest;
 import com.Avy.bank.dtos.requests.UserRegistrationRequest;
+import com.Avy.bank.dtos.responses.OpenAccountResponse;
 import com.Avy.bank.dtos.responses.UserRegistrationResponse;
 import com.Avy.bank.exceptions.InvalidRegistrationDetailsException;
 import com.Avy.bank.exceptions.UserExistException;
+import com.Avy.bank.exceptions.UserNotFoundException;
 import com.Avy.bank.services.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +70,18 @@ public class UserServiceTest {
         request.setAccountType(AccountType.CURRENT);
 
         assertThrows(UserExistException.class,()->userService.register(request));
+
+    }
+
+    @Test
+    public void testThatARegisteredUserCanHaveMultipleAccounts() throws UserNotFoundException {
+       OpenAccountRequest request = new OpenAccountRequest();
+       request.setEmail("veraeze@gmail.com");
+       request.setPassword("Veraeze1234@2.");
+       request.setAccountType(AccountType.FIXED);
+
+       OpenAccountResponse response = userService.addAccount(request);
+       assertThat(response).isNotNull();
 
     }
 
